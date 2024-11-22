@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class BatController : MonoBehaviour
 {
-    public float xRadius = 3.0f;  // X方向の半径
-    public float yRadius = 1.0f;  // Y方向の半径
+    [SerializeField] float xRadius = 3.0f;  // X方向の半径
+    [SerializeField] float yRadius = 1.0f;  // Y方向の半径
     private float duration = 1.25f; // 楕円の片道移動にかける時間（秒）
     private Vector2 centerPosition; // 楕円の中心位置
 
-    public float scaleSpeed = 0.3f; // スケールの速度
-    private Vector3 initialScale;    // 初期スケール
-    public float maxSize = 2.0f;     // 最大サイズ
+    [SerializeField] float scaleSpeed = 0.3f; // スケールの速度
+    private Vector3 firstScale;    // 初期スケール
+    [SerializeField] float maxSize = 2.0f;     // 最大サイズ
 
     public int scoreValue = 50; // この敵を倒した時のスコア
     private ScoreManager scoreManager;
@@ -22,15 +22,15 @@ public class BatController : MonoBehaviour
         centerPosition = transform.position;
 
         // コルーチン開始
-        StartCoroutine(MoveInEllipse());
+        StartCoroutine(MoveBat());
 
-        initialScale = transform.localScale; // 初期スケールを取得
+        firstScale = transform.localScale; // 初期スケールを取得
 
         // スコアマネージャーのオブジェクトを取得
         scoreManager = GameObject.Find("ScoreManager").GetComponent<ScoreManager>();
     }
 
-    IEnumerator MoveInEllipse()
+    IEnumerator MoveBat()
     {
         while (true)
         {
@@ -67,7 +67,7 @@ public class BatController : MonoBehaviour
     private void Update()
     {
         // スケールを徐々に大きくする
-        transform.localScale += initialScale * scaleSpeed * Time.deltaTime;
+        transform.localScale += firstScale * scaleSpeed * Time.deltaTime;
 
         // 現在のサイズが最大サイズを超えたらオブジェクトを消去
         if (transform.localScale.x >= maxSize ||

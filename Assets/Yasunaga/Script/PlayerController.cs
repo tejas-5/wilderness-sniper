@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public GameObject enemyPrefab;
+    [SerializeField] GameObject enemyPrefab;
     //À•W—p‚Ì•Ï”
     Vector3 mousePos, worldPos;
 

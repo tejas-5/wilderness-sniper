@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class SlimeController : MonoBehaviour
 {
-    public float scaleSpeed = 0.3f; // スケールの速度
+    [SerializeField] float scaleSpeed = 0.3f; // スケールの速度
     private Vector3 initialScale;    // 初期スケール
-    public float maxSize = 2.0f;     // 最大サイズ
+    [SerializeField] float maxSize = 2.0f;     // 最大サイズ
 
     public int scoreValue = 10; // この敵を倒した時のスコア
     private ScoreManager scoreManager;

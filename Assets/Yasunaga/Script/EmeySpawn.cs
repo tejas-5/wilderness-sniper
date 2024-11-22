@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpawnArea : MonoBehaviour
+public class EnemySpawn : MonoBehaviour
 {
     public GameObject enemyPrefab; // 敵のプレハブ
-    public float spawnInterval = 3f; // スポーン間隔
+    public float spawnInterval; // スポーン間隔
     public List<Vector3> spawnPoints; // スポーン位置のリスト
 
     private void Start()

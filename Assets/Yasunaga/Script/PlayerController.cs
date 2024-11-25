@@ -1,16 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI; // UIを使う場合
+
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] GameObject enemyPrefab;
     //座標用の変数
     Vector3 mousePos, worldPos;
 
+    public int maxPlayerHp = 100;
+    private int playerHp;
+    public Slider healthSlider; // UIのスライダーで体力を表示
+
     void Start()
     {
-        
+        playerHp = maxPlayerHp;
+
+        // UIのスライダーを初期化（オプション）
+        if (healthSlider != null)
+        {
+            healthSlider.maxValue = maxPlayerHp;
+            healthSlider.value = playerHp;
+        }
     }
 
     void Update()
@@ -21,6 +33,22 @@ public class PlayerController : MonoBehaviour
         worldPos = Camera.main.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 10f));
         //ワールド座標を自身の座標に設定
         transform.position = worldPos;
+        Debug.Log(maxPlayerHp);
     }
+
+    public void AddDamage(int damage)
+    {
+        maxPlayerHp -= damage;
+
+        playerHp = Mathf.Clamp(playerHp, 0, maxPlayerHp);
+
+        // UIのスライダーを更新
+        if (healthSlider != null)
+        {
+            healthSlider.value = playerHp;
+        }
+    }
+
+    
 }
 

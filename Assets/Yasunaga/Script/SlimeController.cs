@@ -10,6 +10,10 @@ public class SlimeController : MonoBehaviour
 
     public int scoreValue = 10; // この敵を倒した時のスコア
     private ScoreManager scoreManager;
+    public int damage = 10;
+    private PlayerController playerController;
+
+   
 
     void Start()
     {
@@ -17,6 +21,10 @@ public class SlimeController : MonoBehaviour
 
         // スコアマネージャーのオブジェクトを取得
         scoreManager = GameObject.Find("ScoreManager").GetComponent<ScoreManager>();
+
+        playerController = GameObject.Find("Player").GetComponent<PlayerController>();
+
+        
     }
 
     void Update()
@@ -29,7 +37,7 @@ public class SlimeController : MonoBehaviour
             transform.localScale.y >= maxSize ||
             transform.localScale.z >= maxSize)
         {
-            Destroy(gameObject); // オブジェクトを消去
+            Damage();
         }
 
     }
@@ -46,5 +54,11 @@ public class SlimeController : MonoBehaviour
 
         // 敵を削除
         Destroy(gameObject);
+    }
+
+    public void Damage()
+    {
+        playerController.AddDamage(damage);
+        Destroy(gameObject); // オブジェクトを消去
     }
 }

@@ -15,6 +15,8 @@ public class BatController : MonoBehaviour
 
     public int scoreValue = 50; // この敵を倒した時のスコア
     private ScoreManager scoreManager;
+    public int damage = 10;
+    private PlayerController playerController;
 
     void Start()
     {
@@ -28,6 +30,8 @@ public class BatController : MonoBehaviour
 
         // スコアマネージャーのオブジェクトを取得
         scoreManager = GameObject.Find("ScoreManager").GetComponent<ScoreManager>();
+
+        playerController = GameObject.Find("Player").GetComponent<PlayerController>();
     }
 
     IEnumerator MoveBat()
@@ -74,7 +78,7 @@ public class BatController : MonoBehaviour
             transform.localScale.y >= maxSize ||
             transform.localScale.z >= maxSize)
         {
-            Destroy(gameObject); // オブジェクトを消去
+            Damage();
         }
     }
 
@@ -90,5 +94,11 @@ public class BatController : MonoBehaviour
 
         // 敵を削除
         Destroy(gameObject);
+    }
+
+    public void Damage()
+    {
+        playerController.AddDamage(damage);
+        Destroy(gameObject); // オブジェクトを消去
     }
 }

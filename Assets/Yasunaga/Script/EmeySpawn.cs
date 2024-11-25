@@ -21,7 +21,6 @@ public class EnemySpawn : MonoBehaviour
     {
         if (spawnPoints.Count == 0)
         {
-            Debug.LogWarning("No spawn points assigned.");
             return;
         }
 

@@ -15,7 +15,7 @@ public class BatController : MonoBehaviour
 
     public int scoreValue = 50; // この敵を倒した時のスコア
     private ScoreManager scoreManager;
-    public int damage = 10;
+    public int damage = 10; //受けるダメージ
     private PlayerController playerController;
 
     void Start()

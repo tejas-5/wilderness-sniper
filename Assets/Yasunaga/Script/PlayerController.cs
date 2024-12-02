@@ -13,6 +13,10 @@ public class PlayerController : MonoBehaviour
     private int playerHp;
     public Slider healthSlider; // UIのスライダーで体力を表示
 
+    public int maxPlayerMp = 100;
+    public int downMp = 10;
+    public Slider mpSlider;
+
     void Start()
     {
         playerHp = maxPlayerHp;
@@ -22,6 +26,10 @@ public class PlayerController : MonoBehaviour
         {
             healthSlider.maxValue = maxPlayerHp;
             healthSlider.value = playerHp;
+        }
+        if (mpSlider != null)
+        {
+            mpSlider.maxValue = maxPlayerMp;
         }
     }
 
@@ -34,6 +42,16 @@ public class PlayerController : MonoBehaviour
         //ワールド座標を自身の座標に設定
         transform.position = worldPos;
         Debug.Log(maxPlayerHp);
+
+        if (Input.GetMouseButtonDown(0)) // 0は左クリック
+        {
+            ReduceMp();
+        }
+
+        if (mpSlider != null)
+        {
+            mpSlider.value = maxPlayerMp;
+        }
     }
 
     public void AddDamage(int damage)
@@ -49,6 +67,12 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    
+    void ReduceMp()
+    {
+        // MPを減少
+        maxPlayerMp = Mathf.Max(0, maxPlayerMp - downMp);
+    }
+
+
 }
 

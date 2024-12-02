@@ -5,19 +5,20 @@ using UnityEngine;
 public class BossController: MonoBehaviour
 {
     private Vector2 pos;
-    [SerializeField] int num = 1;
+    [SerializeField] int num = 1;//方向
 
-    [SerializeField] GameObject bossObject; // 有効化する対象のオブジェクト
+    [SerializeField] GameObject bossObject; 
     [SerializeField] Vector3 startPosition; // 初期位置
     [SerializeField] Vector3 endPosition;    // 移動後の位置
-    [SerializeField] float spawnDelay;// スポーンまでの時間
-    [SerializeField] float moveDuration;// 移動にかかる時間
+    [SerializeField] float spawnDelay = 60f;// スポーンまでの時間
+    [SerializeField] float moveDuration = 0.3f;// 移動にかかる時間
 
-    [SerializeField] GameObject missilePrefab; // 生成するオブジェクトのプレハブ
-    [SerializeField] Transform spawnPoint;  // 生成位置（ボスの前や周囲など）
-    [SerializeField] float spawnInterval; // オブジェクトを生成する間隔（秒）
+    [SerializeField] GameObject missilePrefab; 
+    [SerializeField] float spawnInterval = 3f; // オブジェクトを生成する間隔（秒）
     private bool isSpawning = true; // 生成を制御するフラグ
-    [SerializeField] float missileDelay;
+    [SerializeField] float missileDelay = 62f;
+    [SerializeField] Transform rightArm;
+    [SerializeField] Transform leftArm;
 
     void Start()
     {
@@ -25,7 +26,7 @@ public class BossController: MonoBehaviour
 
         if (bossObject != null) StartCoroutine(SpawnBoss());
         
-        if (bossObject != null) StartCoroutine(SpawnRoutine());
+        if (bossObject != null) StartCoroutine(Missile());
     }
 
     void Update()
@@ -35,14 +36,8 @@ public class BossController: MonoBehaviour
         // （ポイント）マイナスをかけることで逆方向に移動する。
         transform.Translate(transform.right * Time.deltaTime * 3 * num);
 
-        if (pos.x > 5.5)
-        {
-            num = -1;
-        }
-        if (pos.x < -5.5)
-        {
-            num = 1;
-        }
+        if (pos.x > 5.5) num = -1;
+        if (pos.x < -5.5) num = 1;
     }
 
     private IEnumerator SpawnBoss()
@@ -65,25 +60,30 @@ public class BossController: MonoBehaviour
         transform.position = endPosition;
     }
 
-    private IEnumerator SpawnRoutine()
+    private IEnumerator Missile()
     {
         yield return new WaitForSeconds(missileDelay);
 
         while (isSpawning)
         {
             // オブジェクトを生成
-            SpawnObject();
+            SpawnMissile();
 
             // 一定時間待機
             yield return new WaitForSeconds(spawnInterval);
         }
     }
-    void SpawnObject()
+    void SpawnMissile()
     {
-        if (missilePrefab != null && spawnPoint != null)
+        if (missilePrefab != null &&
+            rightArm != null　&&
+            leftArm != null)
         {
-            // 指定された位置でオブジェクトを生成
-            Instantiate(missilePrefab, spawnPoint.position, spawnPoint.rotation);
+            // 発射位置をランダムで選択
+            Transform selectedPosition = Random.Range(0, 2) == 0 ? rightArm : leftArm;
+
+            // 指定された位置と回転でオブジェクトを生成
+            Instantiate(missilePrefab, selectedPosition.position, selectedPosition.rotation);
         }
     }
 }

@@ -16,6 +16,8 @@ public class MissileController : MonoBehaviour
 
     public int scoreValue = 50; // この敵を倒した時のスコア
     private ScoreManager scoreManager;
+    public int damage = 10; //受けるダメージ
+    private PlayerController playerController;
 
     void Start()
     {
@@ -23,6 +25,8 @@ public class MissileController : MonoBehaviour
 
         // スコアマネージャーのオブジェクトを取得
         scoreManager = GameObject.Find("ScoreManager").GetComponent<ScoreManager>();
+
+        playerController = GameObject.Find("Player").GetComponent<PlayerController>();
     }
 
     void Update()
@@ -62,7 +66,7 @@ public class MissileController : MonoBehaviour
                 transform.localScale.y >= maxSize ||
                 transform.localScale.z >= maxSize)
             {
-                Destroy(gameObject); // オブジェクトを消去
+                Damage();
             }
         }
 
@@ -82,5 +86,11 @@ public class MissileController : MonoBehaviour
 
         // 敵を削除
         Destroy(gameObject);
+    }
+
+    public void Damage()
+    {
+        playerController.AddDamage(damage);
+        Destroy(gameObject); // オブジェクトを消去
     }
 }

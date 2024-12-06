@@ -20,9 +20,16 @@ public class BossController: MonoBehaviour
     [SerializeField] Transform rightArm;
     [SerializeField] Transform leftArm;
 
+    [SerializeField] int bossHp = 15;
+    [SerializeField] int hitDamage = 1;
+    public int scoreValue = 150; // この敵を倒した時のスコア
+    private ScoreManager scoreManager;
+
     void Start()
     {
         transform.position = startPosition;
+
+        scoreManager = GameObject.Find("ScoreManager").GetComponent<ScoreManager>();
 
         if (bossObject != null) StartCoroutine(SpawnBoss());
         
@@ -38,6 +45,12 @@ public class BossController: MonoBehaviour
 
         if (pos.x > 5.5) num = -1;
         if (pos.x < -5.5) num = 1;
+        Debug.Log(bossHp);
+
+        if (bossHp == 0)
+        {
+            Die();
+        }
     }
 
     private IEnumerator SpawnBoss()
@@ -85,5 +98,19 @@ public class BossController: MonoBehaviour
             // 指定された位置と回転でオブジェクトを生成
             Instantiate(missilePrefab, selectedPosition.position, selectedPosition.rotation);
         }
+    }
+
+    void OnMouseDown()
+    {
+        bossHp -= hitDamage;
+    }
+
+    public void Die()
+    {
+        // スコアを加算
+        scoreManager.AddScore(scoreValue);
+
+        // 敵を削除
+        Destroy(gameObject);
     }
 }

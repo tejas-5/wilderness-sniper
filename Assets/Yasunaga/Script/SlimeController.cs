@@ -8,9 +8,9 @@ public class SlimeController : MonoBehaviour
     private Vector3 initialScale;    // 初期スケール
     [SerializeField] float maxSize = 2.0f;     // 最大サイズ
 
-    public int scoreValue = 10; // この敵を倒した時のスコア
+    [SerializeField] int scoreValue = 10; // この敵を倒した時のスコア
     private ScoreManager scoreManager;
-    public int damage = 10;
+    [SerializeField] int damage = 10;
     private PlayerController playerController;
 
    
@@ -47,7 +47,7 @@ public class SlimeController : MonoBehaviour
         Die();
     }
 
-    public void Die()
+    private void Die()
     {
         // スコアを加算
         scoreManager.AddScore(scoreValue);
@@ -56,7 +56,7 @@ public class SlimeController : MonoBehaviour
         Destroy(gameObject);
     }
 
-    public void Damage()
+    private void Damage()
     {
         playerController.AddDamage(damage);
         Destroy(gameObject); // オブジェクトを消去

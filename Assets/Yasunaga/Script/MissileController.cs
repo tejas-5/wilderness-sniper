@@ -14,9 +14,9 @@ public class MissileController : MonoBehaviour
     private Vector3 initialScale;    // 初期スケール
     [SerializeField] float maxSize = 2.0f;     // 最大サイズ
 
-    public int scoreValue = 50; // この敵を倒した時のスコア
+    [SerializeField] int scoreValue = 50; // この敵を倒した時のスコア
     private ScoreManager scoreManager;
-    public int damage = 10; //受けるダメージ
+    [SerializeField] int damage = 10; //受けるダメージ
     private PlayerController playerController;
 
     void Start()
@@ -79,7 +79,7 @@ public class MissileController : MonoBehaviour
         Die();
     }
 
-    public void Die()
+    private void Die()
     {
         // スコアを加算
         scoreManager.AddScore(scoreValue);
@@ -88,7 +88,7 @@ public class MissileController : MonoBehaviour
         Destroy(gameObject);
     }
 
-    public void Damage()
+    private void Damage()
     {
         playerController.AddDamage(damage);
         Destroy(gameObject); // オブジェクトを消去

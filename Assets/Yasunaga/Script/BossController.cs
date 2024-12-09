@@ -7,7 +7,6 @@ public class BossController: MonoBehaviour
     private Vector2 pos;
     [SerializeField] int num = 1;//方向
 
-    [SerializeField] GameObject bossObject; 
     [SerializeField] Vector3 startPosition; // 初期位置
     [SerializeField] Vector3 endPosition;    // 移動後の位置
     [SerializeField] float spawnDelay = 60f;// スポーンまでの時間
@@ -22,7 +21,7 @@ public class BossController: MonoBehaviour
 
     [SerializeField] int bossHp = 15;
     [SerializeField] int hitDamage = 1;
-    public int scoreValue = 150; // この敵を倒した時のスコア
+    [SerializeField] int scoreValue = 150; // この敵を倒した時のスコア
     private ScoreManager scoreManager;
 
     void Start()
@@ -31,9 +30,9 @@ public class BossController: MonoBehaviour
 
         scoreManager = GameObject.Find("ScoreManager").GetComponent<ScoreManager>();
 
-        if (bossObject != null) StartCoroutine(SpawnBoss());
+        StartCoroutine(SpawnBoss());
         
-        if (bossObject != null) StartCoroutine(Missile());
+        StartCoroutine(Missile());
     }
 
     void Update()
@@ -57,8 +56,6 @@ public class BossController: MonoBehaviour
     {
         // 1分待機
         yield return new WaitForSeconds(spawnDelay);
-
-        bossObject.SetActive(true);
 
         // 移動
         float elapsedTime = 0f;
@@ -88,15 +85,32 @@ public class BossController: MonoBehaviour
     }
     void SpawnMissile()
     {
-        if (missilePrefab != null &&
-            rightArm != null　&&
-            leftArm != null)
+        if (rightArm != null || leftArm != null)
         {
-            // 発射位置をランダムで選択
-            Transform selectedPosition = Random.Range(0, 2) == 0 ? rightArm : leftArm;
+            Transform selectedPosition = null;
 
-            // 指定された位置と回転でオブジェクトを生成
-            Instantiate(missilePrefab, selectedPosition.position, selectedPosition.rotation);
+            // 発射位置をランダムで選択（存在するもののみ）
+            if (rightArm != null && leftArm != null)
+            {
+                // 両方存在する場合はランダムに選択
+                selectedPosition = Random.Range(0, 2) == 0 ? rightArm : leftArm;
+            }
+            else if (rightArm != null)
+            {
+                // 右アームのみ存在する場合
+                selectedPosition = rightArm;
+            }
+            else if (leftArm != null)
+            {
+                // 左アームのみ存在する場合
+                selectedPosition = leftArm;
+            }
+
+            // 発射位置が決定している場合のみミサイルを生成
+            if (selectedPosition != null)
+            {
+                Instantiate(missilePrefab, selectedPosition.position, selectedPosition.rotation);
+            }
         }
     }
 

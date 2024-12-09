@@ -6,7 +6,7 @@ public class BossArmController : MonoBehaviour
 {
     [SerializeField] int armHp = 10;
     [SerializeField] int hitDamage = 1;
-    public int scoreValue = 100; // この敵を倒した時のスコア
+    [SerializeField] int scoreValue = 100; // この敵を倒した時のスコア
     private ScoreManager scoreManager;
     
 
@@ -30,7 +30,7 @@ public class BossArmController : MonoBehaviour
         armHp -= hitDamage;
     }
 
-    public void Die()
+    private void Die()
     {
         // スコアを加算
         scoreManager.AddScore(scoreValue);

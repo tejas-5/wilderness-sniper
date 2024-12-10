@@ -33,6 +33,8 @@ public class BossController: MonoBehaviour
         StartCoroutine(SpawnBoss());
         
         StartCoroutine(Missile());
+
+        StartCoroutine(FastMissile());
     }
 
     void Update()
@@ -111,6 +113,18 @@ public class BossController: MonoBehaviour
             {
                 Instantiate(missilePrefab, selectedPosition.position, selectedPosition.rotation);
             }
+        }
+    }
+    private IEnumerator FastMissile()
+    {
+        yield return new WaitForSeconds(missileDelay);
+
+        while (isSpawning)
+        {
+            
+
+            // ˆê’èŽžŠÔ‘Ò‹@
+            yield return new WaitForSeconds(spawnInterval);
         }
     }
 

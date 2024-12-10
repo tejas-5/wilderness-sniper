@@ -8,14 +8,10 @@ public class BossArmController : MonoBehaviour
     [SerializeField] int hitDamage = 1;
     [SerializeField] int scoreValue = 100; // この敵を倒した時のスコア
     private ScoreManager scoreManager;
-    
-
     void Start()
     {
         scoreManager = GameObject.Find("ScoreManager").GetComponent<ScoreManager>();
     }
-
-    
     void Update()
     {
         if (armHp == 0)
@@ -24,12 +20,10 @@ public class BossArmController : MonoBehaviour
         }
         Debug.Log(armHp);
     }
-
     void OnMouseDown()
     {
         armHp -= hitDamage;
     }
-
     private void Die()
     {
         // スコアを加算

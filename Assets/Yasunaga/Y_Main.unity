@@ -423,7 +423,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &137969032
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1996,8 +1996,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxPlayerHp: 300
   healthSlider: {fileID: 447906905}
-  maxPlayerMp: 300
-  downMp: 10
+  maxPlayerMp: 100
+  upMp: 10
+  mpDecreaseRate: 5
   mpSlider: {fileID: 126121537}
 --- !u!212 &798793881
 SpriteRenderer:
@@ -4374,6 +4375,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1614626486}
   m_CullTransparentMesh: 1
+--- !u!1 &1626275196
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1626275197}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1626275197
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1626275196}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.25, y: 1.99, z: -0.089994825}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1950686397}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1648413297
 GameObject:
   m_ObjectHideFlags: 0
@@ -5041,7 +5073,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1950686395
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5057,13 +5089,15 @@ MonoBehaviour:
   num: 1
   startPosition: {x: 0, y: 9, z: 0}
   endPosition: {x: 0, y: 1.5, z: 0}
-  spawnDelay: 60
+  spawnDelay: 3
   moveDuration: 0.3
   missilePrefab: {fileID: 4661706653759405584, guid: 1268ba052e903404a9e5fcec4bff41d0, type: 3}
+  fastMissilePrefab: {fileID: 4027072003493177169, guid: 6f4362c172304a742aed660badb7c314, type: 3}
   spawnInterval: 3
-  missileDelay: 62
+  missileDelay: 5
   rightArm: {fileID: 297195146}
   leftArm: {fileID: 1070105541}
+  teal: {fileID: 1626275197}
   bossHp: 15
   hitDamage: 1
   scoreValue: 150
@@ -5135,6 +5169,7 @@ Transform:
   - {fileID: 998412775}
   - {fileID: 1672803269}
   - {fileID: 1780199086}
+  - {fileID: 1626275197}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!70 &1950686398

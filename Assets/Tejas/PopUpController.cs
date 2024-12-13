@@ -16,8 +16,6 @@ public class PopUpController : MonoBehaviour
     private Coroutine randomPopUpCoroutine; // Store the coroutine for showing the popup at random intervals
     private bool[] digitAltered;
 
-    private bool isRKeyPressed = false;
-
     void Start()
     {
         if (rightSideNumbers.Length != 4 || leftSideDigits.Length != 3)
@@ -56,36 +54,35 @@ public class PopUpController : MonoBehaviour
         {
             DecreaseDigit(currentDigitIndex); // 現在の桁の数字を減らす
         }
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            isRKeyPressed = true;
-            if (!popUpPanel.activeSelf) // Only start showing the popup if it's not already active
-            {
-                StartCoroutine(RandomPopUpCoroutine());
-            }
-        }
     }
 
     // Start the coroutine to show popups at random intervals
-    void StartRandomPopUpCoroutine()
+    public void StartRandomPopUpCoroutine(bool skipWaitTime = false)
     {
         if (randomPopUpCoroutine != null)
         {
             StopCoroutine(randomPopUpCoroutine); // Stop any existing coroutine to avoid multiple coroutines running
         }
 
-        randomPopUpCoroutine = StartCoroutine(RandomPopUpCoroutine()); // Start the coroutine that shows the popup at random intervals
+        randomPopUpCoroutine = StartCoroutine(RandomPopUpCoroutine(skipWaitTime)); // Pass the skipWaitTime to the coroutine
     }
 
-    IEnumerator RandomPopUpCoroutine()
+    IEnumerator RandomPopUpCoroutine(bool skipWaitTime)
     {
-        float popUpTime = 3f; // Declare popUpTime once at the start of the coroutine
-
         while (true) // Keep showing the popup randomly while the game is running
         {
-            if (isRKeyPressed)
+            // If skipWaitTime is true, immediately generate the random popup without waiting
+            if (skipWaitTime)
             {
-                isRKeyPressed = false; // Reset the flag
+                GenerateRandomNumbers();
+                ShowPopUp();
+                yield return new WaitUntil(() => CheckCode());
+            }
+            else
+            {
+                // Wait for a random time between minPopupTime and maxPopupTime
+                float popUpTime = 30f;
+                yield return new WaitForSeconds(popUpTime);
 
                 // Generate new random numbers for the popup
                 GenerateRandomNumbers();
@@ -95,32 +92,7 @@ public class PopUpController : MonoBehaviour
 
                 // Wait until the user successfully enters the correct code before proceeding to the next popup
                 yield return new WaitUntil(() => CheckCode());
-
-                // After the correct code, hide the pop-up
-                HidePopUp();
-
-                // Wait for a random time before showing the next pop-up
-                yield return new WaitForSeconds(popUpTime); // Use the existing popUpTime
-                continue; // Proceed to the next iteration
             }
-
-            // Wait for a random time before showing the next pop-up
-            yield return new WaitForSeconds(popUpTime); // Use the existing popUpTime
-
-            // Generate new random numbers for the popup
-            GenerateRandomNumbers();
-
-            // Show the popup with the generated numbers
-            ShowPopUp();
-
-            // Wait until the user successfully enters the correct code before proceeding to the next popup
-            yield return new WaitUntil(() => CheckCode());
-
-            // After the correct code, hide the pop-up
-            HidePopUp();
-
-            // Wait for the next pop-up to appear
-            yield return new WaitForSeconds(popUpTime); // Use the existing popUpTime
         }
     }
 
@@ -172,12 +144,9 @@ public class PopUpController : MonoBehaviour
     }
 
     // Show the popup panel
-    void ShowPopUp()
+    public void ShowPopUp()
     {
-        if (!popUpPanel.activeSelf) // Only show the popup if it's not already active
-        {
-            popUpPanel.SetActive(true); // ポップアップを表示
-        }
+        popUpPanel.SetActive(true); // ポップアップを表示
     }
 
     // Hide the popup panel

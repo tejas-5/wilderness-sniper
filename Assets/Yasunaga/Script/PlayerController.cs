@@ -9,17 +9,20 @@ public class PlayerController : MonoBehaviour
     //座標用の変数
     Vector3 mousePos, worldPos;
 
-    [SerializeField] int maxPlayerHp = 200;
+    [SerializeField] int maxPlayerHp = 100;
     private int playerHp;
     public Slider healthSlider; // UIのスライダーで体力を表示
 
-    [SerializeField] int maxPlayerMp = 100;
-    [SerializeField] int downMp = 10;
+    [SerializeField] float maxPlayerMp = 100f;
+    [SerializeField] float upMp = 10f; // MP増加量
+    [SerializeField] float mpDecreaseRate = 5f; // 毎秒減少するMP量
+    private float currentPlayerMp; // 現在のMP
     public Slider mpSlider;
 
     void Start()
     {
         playerHp = maxPlayerHp;
+        currentPlayerMp = maxPlayerMp; // MPは最大値で開始
 
         // UIのスライダーを初期化（オプション）
         if (healthSlider != null)
@@ -30,6 +33,7 @@ public class PlayerController : MonoBehaviour
         if (mpSlider != null)
         {
             mpSlider.maxValue = maxPlayerMp;
+            mpSlider.value = currentPlayerMp;
         }
     }
 
@@ -48,10 +52,8 @@ public class PlayerController : MonoBehaviour
             ReduceMp();
         }
 
-        if (mpSlider != null)
-        {
-            mpSlider.value = maxPlayerMp;
-        }
+        // 時間経過でMPを減少
+        ReduceMpOverTime();
     }
 
     public void AddDamage(int damage)
@@ -69,8 +71,26 @@ public class PlayerController : MonoBehaviour
 
     void ReduceMp()
     {
-        // MPを減少
-        maxPlayerMp = Mathf.Max(0, maxPlayerMp - downMp);
+        // MPを増加
+        currentPlayerMp = Mathf.Clamp(currentPlayerMp + upMp, 0, maxPlayerMp);
+
+        // スライダーの値を更新
+        if (mpSlider != null)
+        {
+            mpSlider.value = currentPlayerMp;
+        }
+    }
+
+    void ReduceMpOverTime()
+    {
+        // 時間経過に基づいてMPを減少
+        currentPlayerMp = Mathf.Clamp(currentPlayerMp - mpDecreaseRate * Time.deltaTime, 0, maxPlayerMp);
+
+        // スライダーの値を更新
+        if (mpSlider != null)
+        {
+            mpSlider.value = currentPlayerMp;
+        }
     }
 
 

@@ -13,11 +13,13 @@ public class BossController: MonoBehaviour
     [SerializeField] float moveDuration = 0.3f;// 移動にかかる時間
 
     [SerializeField] GameObject missilePrefab; 
+    [SerializeField] GameObject fastMissilePrefab;
     [SerializeField] float spawnInterval = 3f; // オブジェクトを生成する間隔（秒）
     private bool isSpawning = true; // 生成を制御するフラグ
     [SerializeField] float missileDelay = 62f;
     [SerializeField] Transform rightArm;
     [SerializeField] Transform leftArm;
+    [SerializeField] Transform teal;
 
     [SerializeField] int bossHp = 15;
     [SerializeField] int hitDamage = 1;
@@ -34,7 +36,6 @@ public class BossController: MonoBehaviour
         
         StartCoroutine(Missile());
 
-        StartCoroutine(FastMissile());
     }
 
     void Update()
@@ -114,20 +115,39 @@ public class BossController: MonoBehaviour
                 Instantiate(missilePrefab, selectedPosition.position, selectedPosition.rotation);
             }
         }
-    }
-    private IEnumerator FastMissile()
-    {
-        yield return new WaitForSeconds(missileDelay);
-
-        while (isSpawning)
+        else
         {
-            
-
-            // 一定時間待機
-            yield return new WaitForSeconds(spawnInterval);
+            // 両アームが存在しない場合のイベント
+            HandleNoArms();
         }
     }
 
+    void HandleNoArms()
+    {
+        StartCoroutine(FastMissile());
+    }
+    private IEnumerator FastMissile()
+    {
+        while (true) // 必要に応じて条件を追加して終了タイミングを制御
+        {
+            // 特殊攻撃としてオブジェクトを生成
+            SpawnSpecialObject();
+
+            // 一定時間待機
+            yield return new WaitForSeconds(spawnInterval); // spawnIntervalを流用
+        }
+    }
+    void SpawnSpecialObject()
+    {
+        if (teal != null)
+        {
+            Transform selectedPosition = null;
+            if (selectedPosition != null)
+            {
+                Instantiate(fastMissilePrefab, selectedPosition.position, selectedPosition.rotation);
+            }
+        }
+    }
     void OnMouseDown()
     {
         bossHp -= hitDamage;

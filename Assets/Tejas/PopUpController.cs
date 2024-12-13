@@ -16,6 +16,8 @@ public class PopUpController : MonoBehaviour
     private Coroutine randomPopUpCoroutine; // Store the coroutine for showing the popup at random intervals
     private bool[] digitAltered;
 
+    private bool isRKeyPressed = false;
+
     void Start()
     {
         if (rightSideNumbers.Length != 4 || leftSideDigits.Length != 3)
@@ -56,7 +58,11 @@ public class PopUpController : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.R))
         {
-            StartCoroutine(RandomPopUpCoroutine());
+            isRKeyPressed = true;
+            if (!popUpPanel.activeSelf) // Only start showing the popup if it's not already active
+            {
+                StartCoroutine(RandomPopUpCoroutine());
+            }
         }
     }
 
@@ -73,11 +79,33 @@ public class PopUpController : MonoBehaviour
 
     IEnumerator RandomPopUpCoroutine()
     {
+        float popUpTime = 3f; // Declare popUpTime once at the start of the coroutine
+
         while (true) // Keep showing the popup randomly while the game is running
         {
-            // Wait for a random time between minPopupTime and maxPopupTime
-            float popUpTime = 30f;
-            yield return new WaitForSeconds(popUpTime);
+            if (isRKeyPressed)
+            {
+                isRKeyPressed = false; // Reset the flag
+
+                // Generate new random numbers for the popup
+                GenerateRandomNumbers();
+
+                // Show the popup with the generated numbers
+                ShowPopUp();
+
+                // Wait until the user successfully enters the correct code before proceeding to the next popup
+                yield return new WaitUntil(() => CheckCode());
+
+                // After the correct code, hide the pop-up
+                HidePopUp();
+
+                // Wait for a random time before showing the next pop-up
+                yield return new WaitForSeconds(popUpTime); // Use the existing popUpTime
+                continue; // Proceed to the next iteration
+            }
+
+            // Wait for a random time before showing the next pop-up
+            yield return new WaitForSeconds(popUpTime); // Use the existing popUpTime
 
             // Generate new random numbers for the popup
             GenerateRandomNumbers();
@@ -87,6 +115,12 @@ public class PopUpController : MonoBehaviour
 
             // Wait until the user successfully enters the correct code before proceeding to the next popup
             yield return new WaitUntil(() => CheckCode());
+
+            // After the correct code, hide the pop-up
+            HidePopUp();
+
+            // Wait for the next pop-up to appear
+            yield return new WaitForSeconds(popUpTime); // Use the existing popUpTime
         }
     }
 
@@ -140,7 +174,10 @@ public class PopUpController : MonoBehaviour
     // Show the popup panel
     void ShowPopUp()
     {
-        popUpPanel.SetActive(true); // ポップアップを表示
+        if (!popUpPanel.activeSelf) // Only show the popup if it's not already active
+        {
+            popUpPanel.SetActive(true); // ポップアップを表示
+        }
     }
 
     // Hide the popup panel

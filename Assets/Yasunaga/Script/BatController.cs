@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class BatController : MonoBehaviour
 {
-    [SerializeField] float xRadius = 3.0f;  // X方向の半径
-    [SerializeField] float yRadius = 1.0f;  // Y方向の半径
+    private float xRadius = 3.0f;  // X方向の半径
+    private float yRadius = 1.0f;  // Y方向の半径
     private float duration = 1.25f; // 楕円の片道移動にかける時間（秒）
     private Vector2 centerPosition; // 楕円の中心位置
 
@@ -13,9 +13,9 @@ public class BatController : MonoBehaviour
     private Vector3 firstScale;    // 初期スケール
     [SerializeField] float maxSize = 2.0f;     // 最大サイズ
 
-    public int scoreValue = 50; // この敵を倒した時のスコア
+    [SerializeField] int scoreValue = 50; // この敵を倒した時のスコア
     private ScoreManager scoreManager;
-    public int damage = 10; //受けるダメージ
+    [SerializeField] int damage = 10; //受けるダメージ
     private PlayerController playerController;
 
     void Start()
@@ -87,7 +87,7 @@ public class BatController : MonoBehaviour
         Die();
     }
 
-    public void Die()
+    private void Die()
     {
         // スコアを加算
         scoreManager.AddScore(scoreValue);
@@ -96,7 +96,7 @@ public class BatController : MonoBehaviour
         Destroy(gameObject);
     }
 
-    public void Damage()
+    private void Damage()
     {
         playerController.AddDamage(damage);
         Destroy(gameObject); // オブジェクトを消去

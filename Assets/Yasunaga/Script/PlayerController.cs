@@ -9,12 +9,12 @@ public class PlayerController : MonoBehaviour
     //座標用の変数
     Vector3 mousePos, worldPos;
 
-    public int maxPlayerHp = 100;
+    [SerializeField] int maxPlayerHp = 100;
     private int playerHp;
     public Slider healthSlider; // UIのスライダーで体力を表示
 
-    public int maxPlayerMp = 100;
-    public int downMp = 10;
+    [SerializeField] int maxPlayerMp = 100;
+    [SerializeField] int downMp = 10;
     public Slider mpSlider;
 
     void Start()

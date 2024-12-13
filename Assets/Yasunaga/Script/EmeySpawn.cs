@@ -9,6 +9,8 @@ public class EnemySpawn : MonoBehaviour
     [SerializeField] List<Vector3> spawnPoints; // スポーン位置のリスト
     [SerializeField] float newSpawnInterval; // 60秒後に設定する新しいスポーン間隔
 
+    private int lastSpawnIndex = -1; // 前回のスポーン位置のインデックス
+
     private void Start()
     {
         // 一定の間隔でSpawnEnemyメソッドを呼び出す
@@ -24,10 +26,15 @@ public class EnemySpawn : MonoBehaviour
             return;
         }
 
-        // ランダムにスポーン位置を選択
-        Vector3 spawnPosition = spawnPoints[Random.Range(0, spawnPoints.Count)];
+        int spawnIndex;
+        do
+        {
+            spawnIndex = Random.Range(0, spawnPoints.Count);
+        } while (spawnIndex == lastSpawnIndex && spawnPoints.Count > 1);
 
-        // 敵をスポーン
+        lastSpawnIndex = spawnIndex; // 現在のインデックスを保存
+
+        Vector3 spawnPosition = spawnPoints[spawnIndex];
         Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
     }
 

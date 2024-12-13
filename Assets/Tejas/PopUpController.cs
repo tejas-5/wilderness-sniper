@@ -13,6 +13,8 @@ public class PopUpController : MonoBehaviour
     private int[] correctCode = new int[3]; // プレイヤーが入力すべき正しいコード（3桁）
     private Coroutine activeDigitBlinkCoroutine; // アクティブな桁の点滅を管理するコルーチン
     private Coroutine correctAnswerBlinkCoroutine; // 正しい答えの点滅を管理するコルーチン
+    private Coroutine randomPopUpCoroutine; // Store the coroutine for showing the popup at random intervals
+    private bool[] digitAltered;
 
     void Start()
     {
@@ -22,9 +24,13 @@ public class PopUpController : MonoBehaviour
             return;
         }
 
-        GenerateRandomNumbers(); // ランダムな数字を生成
-        ShowPopUp(); // ポップアップを表示
-        StartBlinkingOnCurrentDigit(); // 最初のアクティブ桁の点滅を開始
+        digitAltered = new bool[leftSideDigits.Length]; // Initialize the altered status array
+        for (int i = 0; i < digitAltered.Length; i++)
+        {
+            digitAltered[i] = false; // Initially, no digit has been altered
+        }
+
+        StartRandomPopUpCoroutine(); // Start showing popups at random intervals
     }
 
     void Update()
@@ -48,155 +54,114 @@ public class PopUpController : MonoBehaviour
         {
             DecreaseDigit(currentDigitIndex); // 現在の桁の数字を減らす
         }
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            StartCoroutine(RandomPopUpCoroutine());
+        }
     }
 
+    // Start the coroutine to show popups at random intervals
+    void StartRandomPopUpCoroutine()
+    {
+        if (randomPopUpCoroutine != null)
+        {
+            StopCoroutine(randomPopUpCoroutine); // Stop any existing coroutine to avoid multiple coroutines running
+        }
+
+        randomPopUpCoroutine = StartCoroutine(RandomPopUpCoroutine()); // Start the coroutine that shows the popup at random intervals
+    }
+
+    IEnumerator RandomPopUpCoroutine()
+    {
+        while (true) // Keep showing the popup randomly while the game is running
+        {
+            // Wait for a random time between minPopupTime and maxPopupTime
+            float popUpTime = 30f;
+            yield return new WaitForSeconds(popUpTime);
+
+            // Generate new random numbers for the popup
+            GenerateRandomNumbers();
+
+            // Show the popup with the generated numbers
+            ShowPopUp();
+
+            // Wait until the user successfully enters the correct code before proceeding to the next popup
+            yield return new WaitUntil(() => CheckCode());
+        }
+    }
+
+    // Generate random numbers for the right-side display and correct code
     void GenerateRandomNumbers()
     {
         for (int i = 0; i < rightSideNumbers.Length; i++)
         {
+            rightSideNumbers[i].color = Color.white;
             int randomNumber = Random.Range(100, 1000); // 100から999の間でランダムな数字を生成
             rightSideNumbers[i].text = randomNumber.ToString(); // テキストに設定
         }
 
-        correctCodeIndex = Random.Range(0, rightSideNumbers.Length); // 正しいコードのインデックスをランダムに決定
-        int correctNumber = int.Parse(rightSideNumbers[correctCodeIndex].text); // 正しい番号を取得
-        correctCode[0] = correctNumber / 100; // 正しいコードの百の位
-        correctCode[1] = (correctNumber / 10) % 10; // 正しいコードの十の位
-        correctCode[2] = correctNumber % 10; // 正しいコードの一の位
+        // Randomly select the correct code from the generated numbers
+        correctCodeIndex = Random.Range(0, rightSideNumbers.Length);
+        int correctNumber = int.Parse(rightSideNumbers[correctCodeIndex].text);
+        correctCode[0] = correctNumber / 100; // 百の位
+        correctCode[1] = (correctNumber / 10) % 10; // 十の位
+        correctCode[2] = correctNumber % 10; // 一の位
 
-        StartCoroutine(BlinkCorrectAnswer()); // 正しい答えを点滅させるコルーチンを開始
+        rightSideNumbers[correctCodeIndex].color = Color.red;
+        // Start blinking on the correct answer
+        StartBlinkingCorrectAnswer();
+        currentDigitIndex = 0; // Set the first digit as the active digit
+        StartBlinkingOnCurrentDigit();
     }
 
+    // Start blinking on the correct answer (the number that is the correct code)
+    private void StartBlinkingCorrectAnswer()
+    {
+        if (correctAnswerBlinkCoroutine != null)
+        {
+            StopCoroutine(correctAnswerBlinkCoroutine); // Stop any existing blinking coroutine
+        }
+
+        // Start the blinking coroutine for the correct answer number
+        correctAnswerBlinkCoroutine = StartCoroutine(BlinkCorrectAnswer());
+    }
+
+    // Coroutine to blink the correct answer number
     IEnumerator BlinkCorrectAnswer()
     {
         while (true)
         {
-            yield return new WaitForSeconds(0.4f); // 0.4秒ごとに
-            rightSideNumbers[correctCodeIndex].color = (rightSideNumbers[correctCodeIndex].color == Color.red) ? Color.white : Color.red; // 正しい番号の色を赤と白で点滅させる
+            yield return new WaitForSeconds(0.4f); // 0.4 seconds blink interval
+            // Toggle the color of the correct answer number between red and white
+            rightSideNumbers[correctCodeIndex].color = (rightSideNumbers[correctCodeIndex].color == Color.red) ? Color.white : Color.red;
         }
     }
 
+    // Show the popup panel
     void ShowPopUp()
     {
         popUpPanel.SetActive(true); // ポップアップを表示
     }
 
+    // Hide the popup panel
     public void HidePopUp()
     {
         popUpPanel.SetActive(false); // ポップアップを非表示にする
     }
 
-    // ボタンクリックで数字を増やす
-    public void IncreaseDigit(int index)
+    // Check if the entered code is correct
+    public bool CheckCode()
     {
-        string currentText = leftSideDigits[index].text; // 現在の桁のテキストを取得
+        bool codeMatches = true; // Code match flag
 
-        if (int.TryParse(currentText, out int currentValue))
-        {
-            // 増加させて、9を超えたら0に戻る
-            currentValue = (currentValue + 1) % 10;
-            leftSideDigits[index].text = currentValue.ToString(); // 新しい値をテキストに設定
-        }
-        else
-        {
-            Debug.LogWarning("無効な値です: " + index); // 数字以外の値が入っている場合
-        }
-
-        CheckCode(); // コードをチェック
-    }
-
-    // ボタンクリックで数字を減らす
-    public void DecreaseDigit(int index)
-    {
-        string currentText = leftSideDigits[index].text; // 現在の桁のテキストを取得
-
-        if (int.TryParse(currentText, out int currentValue))
-        {
-            // 減少させて、0未満になったら9に戻る
-            currentValue = (currentValue - 1 + 10) % 10;
-            leftSideDigits[index].text = currentValue.ToString(); // 新しい値をテキストに設定
-        }
-        else
-        {
-            Debug.LogWarning("無効な値です: " + index); // 数字以外の値が入っている場合
-        }
-
-        CheckCode(); // コードをチェック
-    }
-
-    public void MoveToNextDigit()
-    {
-        StopActiveDigitBlink(); // 前のアクティブ桁の点滅を停止
-
-        currentDigitIndex = (currentDigitIndex + 1) % leftSideDigits.Length; // 次の桁に移動
-
-        StartBlinkingOnCurrentDigit(); // 新しい桁の点滅を開始
-    }
-
-    public void MoveToPreviousDigit()
-    {
-        StopActiveDigitBlink(); // 前のアクティブ桁の点滅を停止
-
-        currentDigitIndex = (currentDigitIndex - 1 + leftSideDigits.Length) % leftSideDigits.Length; // 前の桁に移動
-
-        StartBlinkingOnCurrentDigit(); // 新しい桁の点滅を開始
-    }
-
-    // 現在選択されている桁の点滅を開始
-    private void StartBlinkingOnCurrentDigit()
-    {
-        // もし点滅コルーチンがあれば停止
-        if (activeDigitBlinkCoroutine != null)
-        {
-            StopCoroutine(activeDigitBlinkCoroutine);
-        }
-
-        // 現在選択されている桁の点滅コルーチンを開始
-        activeDigitBlinkCoroutine = StartCoroutine(BlinkActiveDigit());
-    }
-
-    // 現在選択されている桁の点滅を停止
-    private void StopActiveDigitBlink()
-    {
-        if (activeDigitBlinkCoroutine != null)
-        {
-            StopCoroutine(activeDigitBlinkCoroutine); // 点滅コルーチンを停止
-            leftSideDigits[currentDigitIndex].color = Color.white; // 色を白に戻す
-        }
-    }
-
-    // 現在選択されている桁の点滅を行うコルーチン
-    IEnumerator BlinkActiveDigit()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(0.4f); // 0.4秒ごとに点滅
-            // アクティブ桁の色を黒と白で交互に点滅させる
-            leftSideDigits[currentDigitIndex].color = (leftSideDigits[currentDigitIndex].color == Color.black) ? Color.white : Color.black;
-        }
-    }
-
-    // 入力されたコードをチェック
-    public void CheckCode()
-    {
-        bool codeMatches = true; // コードが一致するかどうかのフラグ
-
-        string enteredCode = "";
-        for (int i = 0; i < leftSideDigits.Length; i++)
-        {
-            enteredCode += leftSideDigits[i].text + " "; // 入力されたコードを文字列としてまとめる
-        }
-        Debug.Log("入力されたコード: " + enteredCode); // デバッグ用に表示
-
-        // 入力されたコードが正しいかどうかをチェック
+        // Check each digit entered by the player
         for (int i = 0; i < leftSideDigits.Length; i++)
         {
             int playerInputValue = 0;
-            if (int.TryParse(leftSideDigits[i].text, out playerInputValue)) // 数字が正しく入力されているかチェック
+            if (int.TryParse(leftSideDigits[i].text, out playerInputValue))
             {
-                Debug.Log($"比較: プレイヤー入力: {playerInputValue}, 正しいコード: {correctCode[i]}");
-
-                if (playerInputValue != correctCode[i]) // 正しいコードと一致しない場合
+                // Compare the player's input with the correct code
+                if (playerInputValue != correctCode[i])
                 {
                     codeMatches = false;
                     break;
@@ -204,21 +169,104 @@ public class PopUpController : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("無効な入力です: " + i); // 数字以外が入力された場合
                 codeMatches = false;
                 break;
             }
         }
 
-        // コードが一致した場合、ポップアップを閉じる
+        // If the code matches, hide the popup and return true
         if (codeMatches)
         {
-            Debug.Log("コードが一致しました！ポップアップを閉じます...");
             HidePopUp();
+            return true; // Correct code entered
         }
-        else
+
+        // If the code doesn't match, return false
+        return false;
+    }
+
+    // Button clicks to modify the current digit
+    public void IncreaseDigit(int index)
+    {
+        string currentText = leftSideDigits[index].text;
+
+        if (int.TryParse(currentText, out int currentValue))
         {
-            Debug.Log("コードが一致しません。もう一度試してください。");
+            currentValue = (currentValue + 1) % 10;
+            leftSideDigits[index].text = currentValue.ToString();
+            digitAltered[index] = true;
+        }
+
+        CheckCode();
+        UpdateDigitColors();
+    }
+
+    public void DecreaseDigit(int index)
+    {
+        string currentText = leftSideDigits[index].text;
+
+        if (int.TryParse(currentText, out int currentValue))
+        {
+            currentValue = (currentValue - 1 + 10) % 10;
+            leftSideDigits[index].text = currentValue.ToString();
+            digitAltered[index] = true;
+        }
+
+        CheckCode();
+        UpdateDigitColors();
+    }
+
+    public void MoveToNextDigit()
+    {
+        StopActiveDigitBlink(); // Stop the blinking on the previous digit
+        currentDigitIndex = (currentDigitIndex + 1) % leftSideDigits.Length; // Move to the next digit
+        StartBlinkingOnCurrentDigit(); // Start blinking on the new digit
+    }
+
+    public void MoveToPreviousDigit()
+    {
+        StopActiveDigitBlink(); // Stop the blinking on the previous digit
+        currentDigitIndex = (currentDigitIndex - 1 + leftSideDigits.Length) % leftSideDigits.Length; // Move to the previous digit
+        StartBlinkingOnCurrentDigit(); // Start blinking on the new digit
+    }
+
+    // Start blinking on the current active digit
+    private void StartBlinkingOnCurrentDigit()
+    {
+        if (activeDigitBlinkCoroutine != null)
+        {
+            StopCoroutine(activeDigitBlinkCoroutine); // Stop the existing blinking coroutine
+        }
+
+        // Start the new blinking coroutine for the current active digit
+        activeDigitBlinkCoroutine = StartCoroutine(BlinkActiveDigit());
+    }
+
+    // Stop blinking on the current active digit
+    private void StopActiveDigitBlink()
+    {
+        if (activeDigitBlinkCoroutine != null)
+        {
+            StopCoroutine(activeDigitBlinkCoroutine); // Stop the blinking coroutine
+            leftSideDigits[currentDigitIndex].color = Color.white; // Reset the color to white
+        }
+    }
+
+    // Blinking coroutine for the active digit
+    IEnumerator BlinkActiveDigit()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(0.4f); // 0.4 seconds blink interval
+            // Toggle the color of the current active digit between black and white
+            leftSideDigits[currentDigitIndex].color = (leftSideDigits[currentDigitIndex].color == Color.black) ? Color.white : Color.black;
+        }
+    }
+    private void UpdateDigitColors()
+    {
+        for (int i = 0; i < leftSideDigits.Length; i++)
+        {
+            leftSideDigits[i].color = digitAltered[i] ? Color.white : Color.black;
         }
     }
 
@@ -226,7 +274,8 @@ public class PopUpController : MonoBehaviour
     {
         for (int i = 0; i < leftSideDigits.Length; i++)
         {
-            leftSideDigits[i].text = "0"; // すべての桁を0にリセット
+            leftSideDigits[i].text = "0"; // Reset all digits to 0
+            digitAltered[i] = false;
         }
     }
 }

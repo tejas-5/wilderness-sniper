@@ -1,140 +1,143 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI; // UIを使う場合
-
+using UnityEngine.UI; // UIを使うために必要
 
 public class PlayerController : MonoBehaviour
 {
-    //座標用の変数
+    // プレイヤーの座標をマウスの位置で決めるための変数
     Vector3 mousePos, worldPos;
 
-    [SerializeField] int maxPlayerHp = 100;
-    private int playerHp;
-    public Slider healthSlider; // UIのスライダーで体力を表示
+    [SerializeField] int maxPlayerHp = 100; // 最大HP
+    private int playerHp; // 現在のHP
+    public Slider healthSlider; // UIのスライダーでHPを表示
 
-    [SerializeField] float maxPlayerMp = 100f;
-    [SerializeField] float upMp = 10f; // MP増加量
-    [SerializeField] float mpDecreaseRate = 5f; // 毎秒減少するMP量
+    [SerializeField] float maxPlayerMp = 100f; // 最大MP
+    [SerializeField] float mpDecreaseRate = 5f; // MPが毎秒減る量
     private float currentPlayerMp; // 現在のMP
-    public Slider mpSlider;
+    public Slider mpSlider; // UIのスライダーでMPを表示
 
-    public PopUpController popUpController;
+    public PopUpController popUpController; // ポップアップ表示を制御するクラス
     [SerializeField] float mpIncreaseInterval = 1f; // MPが増加する間隔（秒）
-    [SerializeField] int mpIncreaseAmount = 1; // 1回の増加量
-    [SerializeField] float popUpChance = 0.5f; // ポップアップが表示される確率（0.0 - 1.0）
+    [SerializeField] int mpIncreaseAmount = 1; // 1回のMP増加量
+    [SerializeField] float popUpChance = 0.1f; // ポップアップが表示される確率（0.0 - 1.0）
 
+    private bool isPopUpWaiting = false;
+
+    // ゲーム開始時に呼ばれる
     void Start()
     {
-        playerHp = maxPlayerHp;
-        currentPlayerMp = maxPlayerMp; // MPは最大値で開始
+        playerHp = maxPlayerHp; // プレイヤーのHPを最大に設定
+        currentPlayerMp = maxPlayerMp; // プレイヤーのMPを最大に設定
 
-        // UIのスライダーを初期化（オプション）
+        // HPスライダーを初期化（UIに表示）
         if (healthSlider != null)
         {
-            healthSlider.maxValue = maxPlayerHp;
-            healthSlider.value = playerHp;
+            healthSlider.maxValue = maxPlayerHp; // HPスライダーの最大値を設定
+            healthSlider.value = playerHp; // 現在のHPスライダーの値を設定
         }
+
+        // MPスライダーを初期化（UIに表示）
         if (mpSlider != null)
         {
-            mpSlider.maxValue = maxPlayerMp;
-            mpSlider.value = currentPlayerMp;
+            mpSlider.maxValue = maxPlayerMp; // MPスライダーの最大値を設定
+            mpSlider.value = currentPlayerMp; // 現在のMPスライダーの値を設定
         }
-        // MPが時間経過で増加するコルーチンを開始
+
+        // MPを時間経過で増加させるコルーチンを開始
         StartCoroutine(IncreaseMpOverTime());
-        
     }
 
+    // 毎フレーム呼ばれる
     void Update()
     {
-        //マウス座標の取得
+        // マウスの座標を取得
         mousePos = Input.mousePosition;
-        //スクリーン座標をワールド座標に変換
-        worldPos = Camera.main.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 10f));
-        //ワールド座標を自身の座標に設定
-        transform.position = worldPos;
-        //Debug.Log(maxPlayerHp);
-        //Debug.Log(maxPlayerMp);
 
-        if (Input.GetMouseButtonDown(0)) // 0は左クリック
+        // スクリーン座標をワールド座標に変換
+        worldPos = Camera.main.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 10f));
+
+        // プレイヤーの位置をマウスの位置に設定
+        transform.position = worldPos;
+
+        // もし左クリックが押されたら
+        if (Input.GetMouseButtonDown(0))
         {
-            ReduceMp();
+            ReduceMp(); // MPを減らす
         }
     }
 
+    // プレイヤーにダメージを与える関数
     public void AddDamage(int damage)
     {
-        maxPlayerHp -= damage;
+        maxPlayerHp -= damage; // 最大HPをダメージ分減らす
 
+        // HPが0未満にならないように制限
         playerHp = Mathf.Clamp(playerHp, 0, maxPlayerHp);
 
-        // UIのスライダーを更新
+        // HPスライダーを更新
         if (healthSlider != null)
         {
             healthSlider.value = playerHp;
         }
     }
 
+    // MPを減らす関数
     void ReduceMp()
     {
-        // MPを増加
+        // MPを減少させ、0未満にならないように制限
         currentPlayerMp = Mathf.Clamp(currentPlayerMp - mpDecreaseRate, 0, maxPlayerMp);
 
-        // スライダーの値を更新
+        // MPスライダーを更新
         if (mpSlider != null)
         {
             mpSlider.value = currentPlayerMp;
         }
     }
 
-    void ReduceMpOverTime()
-    {
-        // 時間経過に基づいてMPを減少
-        currentPlayerMp = Mathf.Clamp(currentPlayerMp - mpDecreaseRate * Time.deltaTime, 0, maxPlayerMp);
-
-        // スライダーの値を更新
-        if (mpSlider != null)
-        {
-            mpSlider.value = currentPlayerMp;
-        }
-    }
-
+    // MPを増加させる関数
     void IncreaseMp()
     {
-        // Increase the current MP by the specified amount
-        currentPlayerMp = Mathf.Min(currentPlayerMp + mpIncreaseAmount, maxPlayerMp); // Ensure current MP doesn't exceed max MP
+        // MPを増加させ、最大値を超えないように制限
+        currentPlayerMp = Mathf.Min(currentPlayerMp + mpIncreaseAmount, maxPlayerMp);
+
+        // MPスライダーを更新
         if (mpSlider != null)
         {
-            mpSlider.value = currentPlayerMp; // Update the UI slider
+            mpSlider.value = currentPlayerMp;
         }
     }
-    // コルーチンでMPを時間経過で増加させる
+
+    // MPを時間経過で増加させるコルーチン
     IEnumerator IncreaseMpOverTime()
     {
-        while (true) // 無限ループでMPを増加し続ける
+        while (true) // 無限ループでMPを増加させる
         {
-            // MP増加処理
-            IncreaseMp();
+            //if (!isPopUpWaiting)
+            //{
+                // MPを増加させる
+                IncreaseMp();
 
-            // チャンスの確率でポップアップ表示
-            if (currentPlayerMp < maxPlayerMp && Random.value <= popUpChance) // チャンスの確率でポップアップ表示
-            {
-                if (popUpController != null)
+                // もしMPが最大値未満で、ランダムな確率でポップアップを表示
+                if (currentPlayerMp < maxPlayerMp && Random.value <= popUpChance)
                 {
-                    popUpController.StartRandomPopUpCoroutine(true); // Start the pop-up coroutine here
+                    // ポップアップが表示されるチャンスが来たら
+                    if (popUpController != null)
+                    {
+                        popUpController.StartRandomPopUpCoroutine(true); // ポップアップを開始
+                        isPopUpWaiting = true;
+                    }
                 }
-            }
-
-            // 指定した間隔だけ待機
+            //}
+            // 指定した時間だけ待つ
             yield return new WaitForSeconds(mpIncreaseInterval);
+            if (isPopUpWaiting)
+            {
+                yield return new WaitForSeconds(20f); // Wait for 20 seconds
+                isPopUpWaiting = false; // Reset the flag to allow another pop-up
+            }
+            
         }
     }
-    void ShowPopUp()
-    {
-        if (popUpController != null)
-        {
-            // ポップアップを表示するための関数を呼び出す
-            popUpController.ShowPopUp();
-        }
-    }
+
 }

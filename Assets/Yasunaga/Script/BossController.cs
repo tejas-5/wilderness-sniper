@@ -2,25 +2,33 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BossController: MonoBehaviour
+public class BossController : MonoBehaviour
 {
+    //ボス移動
     private Vector2 pos;
     [SerializeField] int num = 1;//方向
+    [SerializeField] int moveSpeed = 3;
 
-    [SerializeField] Vector3 startPosition; // 初期位置
-    [SerializeField] Vector3 endPosition;    // 移動後の位置
+    //ボススポーン
     [SerializeField] float spawnDelay = 60f;// スポーンまでの時間
-    [SerializeField] float moveDuration = 0.3f;// 移動にかかる時間
+    [SerializeField] Vector3 startPosition; // 初期位置
+    [SerializeField] Vector3 endPosition;    // 最終位置
+    [SerializeField] float moveDuration = 0.3f; //最終位置移動までかかる時間
 
-    [SerializeField] GameObject missilePrefab; 
-    [SerializeField] GameObject fastMissilePrefab;
-    [SerializeField] float spawnInterval = 3f; // オブジェクトを生成する間隔（秒）
+    //ハサミからの攻撃
     private bool isSpawning = true; // 生成を制御するフラグ
-    [SerializeField] float missileDelay = 62f;
+    [SerializeField] float missileDelay = 62f;　//ミサイル発射までの時間
+    [SerializeField] GameObject missilePrefab;
+    [SerializeField] float armInterval = 3f; // オブジェクトを生成する間隔（秒）
     [SerializeField] Transform rightArm;
     [SerializeField] Transform leftArm;
+    //尻尾からの攻撃
+    private bool isTealAttack = false;
+    [SerializeField] GameObject fastMissilePrefab;
+    [SerializeField] float tealInterval = 2f;
     [SerializeField] Transform teal;
 
+    //パラメーター
     [SerializeField] int bossHp = 15;
     [SerializeField] int hitDamage = 1;
     [SerializeField] int scoreValue = 150; // この敵を倒した時のスコア
@@ -33,132 +41,104 @@ public class BossController: MonoBehaviour
         scoreManager = GameObject.Find("ScoreManager").GetComponent<ScoreManager>();
 
         StartCoroutine(SpawnBoss());
-        
-        StartCoroutine(Missile());
 
+        StartCoroutine(ArmAttack());
     }
 
     void Update()
     {
         pos = transform.position;
 
-        // （ポイント）マイナスをかけることで逆方向に移動する。
-        transform.Translate(transform.right * Time.deltaTime * 3 * num);
-
+        // マイナスをかけることで逆方向に移動
+        transform.Translate(transform.right * Time.deltaTime * moveSpeed * num);
         if (pos.x > 5.5) num = -1;
         if (pos.x < -5.5) num = 1;
-        Debug.Log(bossHp);
 
-        if (bossHp == 0)
-        {
-            Die();
-        }
+        if (bossHp == 0) Die();
     }
 
+    //ボススポーン
     private IEnumerator SpawnBoss()
     {
-        // 1分待機
         yield return new WaitForSeconds(spawnDelay);
 
-        // 移動
+        // 最終位置まで移動
         float elapsedTime = 0f;
         while (elapsedTime < moveDuration)
         {
             transform.position = Vector3.Lerp(startPosition, endPosition, elapsedTime / moveDuration);
             elapsedTime += Time.deltaTime;
-            yield return null; // フレームをまたぐ
+            yield return null;
         }
 
-        // 最終位置を確実に設定
+        //最終位置を設定
         transform.position = endPosition;
     }
 
-    private IEnumerator Missile()
+    //ハサミ攻撃
+    private IEnumerator ArmAttack()
     {
         yield return new WaitForSeconds(missileDelay);
 
         while (isSpawning)
         {
-            // オブジェクトを生成
-            SpawnMissile();
-
-            // 一定時間待機
-            yield return new WaitForSeconds(spawnInterval);
+            ArmMissile();
+            yield return new WaitForSeconds(armInterval);
         }
     }
-    void SpawnMissile()
+    //ハサミミサイル
+    void ArmMissile()
     {
         if (rightArm != null || leftArm != null)
         {
             Transform selectedPosition = null;
 
-            // 発射位置をランダムで選択（存在するもののみ）
-            if (rightArm != null && leftArm != null)
-            {
-                // 両方存在する場合はランダムに選択
+            // 発射位置をランダムで選択
+            if (rightArm != null && leftArm != null) 
                 selectedPosition = Random.Range(0, 2) == 0 ? rightArm : leftArm;
-            }
-            else if (rightArm != null)
-            {
-                // 右アームのみ存在する場合
+            // 右ハサミのみ存在する場合
+            else if (rightArm != null) 
                 selectedPosition = rightArm;
-            }
-            else if (leftArm != null)
-            {
-                // 左アームのみ存在する場合
+            // 左ハサミのみ存在する場合
+            else if (leftArm != null) 
                 selectedPosition = leftArm;
-            }
 
             // 発射位置が決定している場合のみミサイルを生成
-            if (selectedPosition != null)
-            {
+            if (selectedPosition != null) 
                 Instantiate(missilePrefab, selectedPosition.position, selectedPosition.rotation);
-            }
         }
-        else
+        //両ハサミが破壊されたら尻尾攻撃
+        else if (!isTealAttack)
         {
-            // 両アームが存在しない場合のイベント
-            HandleNoArms();
+            isTealAttack = true; // 尻尾攻撃開始フラグを設定
+            StartCoroutine(TealAttack());
         }
     }
 
-    void HandleNoArms()
+    //尻尾攻撃
+    private IEnumerator TealAttack()
     {
-        StartCoroutine(FastMissile());
-    }
-    private IEnumerator FastMissile()
-    {
-        while (true) // 必要に応じて条件を追加して終了タイミングを制御
+        while (isTealAttack)
         {
-            // 特殊攻撃としてオブジェクトを生成
-            SpawnSpecialObject();
-
-            // 一定時間待機
-            yield return new WaitForSeconds(spawnInterval); // spawnIntervalを流用
+            TealMissile();
+            yield return new WaitForSeconds(tealInterval);
         }
     }
-    void SpawnSpecialObject()
+    //尻尾ミサイル
+    void TealMissile()
     {
         if (teal != null)
-        {
-            Transform selectedPosition = null;
-            if (selectedPosition != null)
-            {
-                Instantiate(fastMissilePrefab, selectedPosition.position, selectedPosition.rotation);
-            }
-        }
+            Instantiate(fastMissilePrefab, teal.position, teal.rotation);
     }
     void OnMouseDown()
     {
         bossHp -= hitDamage;
     }
-
     public void Die()
     {
         // スコアを加算
         scoreManager.AddScore(scoreValue);
 
-        // 敵を削除
         Destroy(gameObject);
     }
 }

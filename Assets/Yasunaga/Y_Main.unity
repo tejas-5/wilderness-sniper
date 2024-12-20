@@ -2102,6 +2102,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: ErrorCode
       objectReference: {fileID: 0}
+    - target: {fileID: 7268983371069402394, guid: 460a8c82d48344f4e90097e7a011e208, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2778,16 +2782,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   num: 1
+  moveSpeed: 3
+  spawnDelay: 3
   startPosition: {x: 0, y: 9, z: 0}
   endPosition: {x: 0, y: 1.5, z: 0}
-  spawnDelay: 3
   moveDuration: 0.3
-  missilePrefab: {fileID: 4661706653759405584, guid: 1268ba052e903404a9e5fcec4bff41d0, type: 3}
-  fastMissilePrefab: {fileID: 4027072003493177169, guid: 6f4362c172304a742aed660badb7c314, type: 3}
-  spawnInterval: 3
   missileDelay: 5
+  missilePrefab: {fileID: 4661706653759405584, guid: 1268ba052e903404a9e5fcec4bff41d0, type: 3}
+  armInterval: 3
   rightArm: {fileID: 297195146}
   leftArm: {fileID: 1070105541}
+  fastMissilePrefab: {fileID: 4027072003493177169, guid: 6f4362c172304a742aed660badb7c314, type: 3}
+  tealInterval: 2
   teal: {fileID: 1626275197}
   bossHp: 15
   hitDamage: 1

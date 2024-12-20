@@ -5,182 +5,181 @@ using TMPro;
 
 public class PopUpController : MonoBehaviour
 {
+    [Header("UI Panel")]
+    public GameObject popUpPanel; // ポップアップのパネル
 
-    [Header(" UI Panel ")]
-    public GameObject popUpPanel; // 億僢僾傾僢僾偺僷僱儖
+    [Header("Digits Elements")]
+    [SerializeField] private TextMeshProUGUI[] rightSideNumbers; // 右側の番号
+    [SerializeField] private TextMeshProUGUI[] leftSideDigits; // 左側の数字
+    public int correctCodeIndex; // 正しいコードのインデックス
 
-    [Header(" Digits Elements ")]
-    [SerializeField] private TextMeshProUGUI[] rightSideNumbers; // 塃懁偵昞帵偡傞悢帤偺攝楍
-    [SerializeField] private TextMeshProUGUI[] leftSideDigits; // 嵍懁偵昞帵偡傞悢帤偺攝楍
-    public int correctCodeIndex; // 惓偟偄僐乕僪偺僀儞僨僢僋僗
+    private int currentDigitIndex = 0; // 現在の数字のインデックス
+    private int[] correctCode = new int[3]; // 正しいコード（3桁）
+    private Coroutine activeDigitBlinkCoroutine; // 現在の数字の点滅コルーチン
+    private Coroutine correctAnswerBlinkCoroutine; // 正しい答えの点滅コルーチン
+    private Coroutine randomPopUpCoroutine; // ランダムなポップアップのコルーチン
+    private bool[] digitAltered; // 数字が変更されたかどうか
 
-    private int currentDigitIndex = 0; // 尰嵼慖戰偝傟偰偄傞寘
-    private int[] correctCode = new int[3]; // 惓偟偄僐乕僪乮3寘乯
-    private Coroutine activeDigitBlinkCoroutine; // 傾僋僥傿僽寘偺揰柵僐儖乕僠儞
-    private Coroutine correctAnswerBlinkCoroutine; // 惓偟偄摎偊偺揰柵僐儖乕僠儞
-    private Coroutine randomPopUpCoroutine; // 儔儞僟儉側僞僀儈儞僌偱億僢僾傾僢僾傪昞帵偡傞僐儖乕僠儞
-    private bool[] digitAltered; // 擖椡偝傟偨寘偑曄峏偝傟偨偐偳偆偐
-
-    private bool isPopUpActive = false; // 億僢僾傾僢僾偑傾僋僥傿僽偐偳偆偐
+    private bool isPopUpActive = false; // ポップアップがアクティブかどうか
 
     // Start is called before the first frame update
     void Start()
     {
         if (rightSideNumbers.Length != 4 || leftSideDigits.Length != 3)
         {
-            return; // 攝楍偺僒僀僘偑惓偟偔側偄応崌丄張棟傪廔椆
+            return; // 配列の長さが間違っている場合、処理を終了
         }
 
-        digitAltered = new bool[leftSideDigits.Length]; // 曄峏偝傟偨寘偺忬懺傪娗棟
+        digitAltered = new bool[leftSideDigits.Length]; // 左側の数字の変更フラグを初期化
         for (int i = 0; i < digitAltered.Length; i++)
         {
-            digitAltered[i] = false; // 嵟弶偼曄峏側偟
+            digitAltered[i] = false; // 変更されていないと設定
         }
 
-        StartRandomPopUpCoroutine(); // 儔儞僟儉僞僀儈儞僌偱億僢僾傾僢僾傪昞帵偡傞僐儖乕僠儞傪奐巒
+        StartRandomPopUpCoroutine(); // ランダムポップアップを開始
     }
 
     // Update is called once per frame
     void Update()
     {
-        // 擖椡偝傟偨僉乕偱寘傪曄峏偡傞
+        // Aキーを押したとき
         if (Input.GetKeyDown(KeyCode.A))
         {
-            MoveToPreviousDigit(); // 慜偺寘傊堏摦
+            MoveToPreviousDigit(); // 前の数字に移動
         }
         else if (Input.GetKeyDown(KeyCode.D))
         {
-            MoveToNextDigit(); // 師偺寘傊堏摦
+            MoveToNextDigit(); // 次の数字に移動
         }
 
-        // 擖椡偝傟偨僉乕偱寘偺悢帤傪憹尭偝偣傞
+        // Wキーを押したとき
         if (Input.GetKeyDown(KeyCode.W))
         {
-            IncreaseDigit(currentDigitIndex); // 尰嵼偺寘傪憹傗偡
+            IncreaseDigit(currentDigitIndex); // 現在の数字を増やす
         }
         else if (Input.GetKeyDown(KeyCode.S))
         {
-            DecreaseDigit(currentDigitIndex); // 尰嵼偺寘傪尭傜偡
+            DecreaseDigit(currentDigitIndex); // 現在の数字を減らす
         }
     }
 
-    // 儔儞僟儉側僞僀儈儞僌偱億僢僾傾僢僾傪昞帵偡傞僐儖乕僠儞傪奐巒
+    // ランダムなポップアップを開始する
     public void StartRandomPopUpCoroutine(bool skipWaitTime = false)
     {
         if (randomPopUpCoroutine != null)
         {
-            StopCoroutine(randomPopUpCoroutine); // 婛懚偺僐儖乕僠儞傪掆巭
+            StopCoroutine(randomPopUpCoroutine); // すでに実行中のポップアップを止める
         }
-        randomPopUpCoroutine = StartCoroutine(RandomPopUpCoroutine(skipWaitTime)); // 怴偟偄僐儖乕僠儞傪奐巒
+        randomPopUpCoroutine = StartCoroutine(RandomPopUpCoroutine(skipWaitTime)); // 新しいランダムポップアップを開始
     }
 
-    // 儔儞僟儉側僞僀儈儞僌偱億僢僾傾僢僾傪昞帵偡傞僐儖乕僠儞
+    // ランダムなポップアップを表示するコルーチン
     IEnumerator RandomPopUpCoroutine(bool skipWaitTime)
     {
-        while (true) // 僎乕儉偑恑峴偟偰偄傞娫丄億僢僾傾僢僾傪昞帵偟懕偗傞
+        while (true) // 無限ループ
         {
             if (isPopUpActive)
             {
-                yield return null; // 億僢僾傾僢僾偑昞帵拞側傜懸婡
+                yield return null; // ポップアップがアクティブな場合、何もしない
                 continue;
             }
 
             if (skipWaitTime)
             {
-                GenerateRandomNumbers(); // 儔儞僟儉側悢帤傪惗惉
-                ShowPopUp(); // 億僢僾傾僢僾傪昞帵
-                yield return new WaitUntil(() => CheckCode()); // 惓偟偄僐乕僪偑擖椡偝傟傞傑偱懸婡
-                HidePopUp(); // Hide the popup after correct input
-                yield break; // Exit the coroutine once the code is entered correctly
+                GenerateRandomNumbers(); // ランダムな番号を生成
+                ShowPopUp(); // ポップアップを表示
+                yield return new WaitUntil(() => CheckCode()); // コードが正しいか確認
+                HidePopUp(); // 正しいコードが入力されたらポップアップを隠す
+                yield break; // コルーチンを終了
             }
             else
             {
                 float popUpTime = 30f;
-                yield return new WaitForSeconds(popUpTime); // 30昩懸婡
+                yield return new WaitForSeconds(popUpTime); // 30秒待つ
 
-                GenerateRandomNumbers(); // 儔儞僟儉側悢帤傪惗惉
-                ShowPopUp(); // 億僢僾傾僢僾傪昞帵
-                yield return new WaitUntil(() => CheckCode()); // 惓偟偄僐乕僪偑擖椡偝傟傞傑偱懸婡
-                HidePopUp(); // Hide the popup after correct input
-                yield break; // Exit the coroutine once the code is entered correctly
+                GenerateRandomNumbers(); // ランダムな番号を生成
+                ShowPopUp(); // ポップアップを表示
+                yield return new WaitUntil(() => CheckCode()); // コードが正しいか確認
+                HidePopUp(); // 正しいコードが入力されたらポップアップを隠す
+                yield break; // コルーチンを終了
             }
         }
     }
 
-    // 儔儞僟儉側悢帤傪惗惉偟丄億僢僾傾僢僾傪昞帵偡傞弨旛傪偡傞
+    // ランダムな番号を生成
     void GenerateRandomNumbers()
     {
         for (int i = 0; i < rightSideNumbers.Length; i++)
         {
-            rightSideNumbers[i].color = Color.white; // 悢帤偺怓傪儕僙僢僩
-            int randomNumber = Random.Range(100, 1000); // 100偐傜999偺娫偱儔儞僟儉側悢帤傪惗惉
-            rightSideNumbers[i].text = randomNumber.ToString(); // 僥僉僗僩偵愝掕
+            rightSideNumbers[i].color = Color.white; // 右側の数字の色を白に設定
+            int randomNumber = Random.Range(100, 1000); // 100から999までのランダムな数字
+            rightSideNumbers[i].text = randomNumber.ToString(); // 数字を表示
         }
 
-        correctCodeIndex = Random.Range(0, rightSideNumbers.Length); // 惓偟偄僐乕僪傪儔儞僟儉偵慖戰
+        correctCodeIndex = Random.Range(0, rightSideNumbers.Length); // 正しいコードのインデックスをランダムに選択
         int correctNumber = int.Parse(rightSideNumbers[correctCodeIndex].text);
-        correctCode[0] = correctNumber / 100; // 昐偺埵
-        correctCode[1] = (correctNumber / 10) % 10; // 廫偺埵
-        correctCode[2] = correctNumber % 10; // 堦偺埵
+        correctCode[0] = correctNumber / 100; // 百の位
+        correctCode[1] = (correctNumber / 10) % 10; // 十の位
+        correctCode[2] = correctNumber % 10; // 一の位
 
-        rightSideNumbers[correctCodeIndex].color = Color.red; // 惓偟偄悢帤傪愒怓偵愝掕
-        StartBlinkingCorrectAnswer(); // 惓偟偄摎偊傪揰柵偝偣傞
-        currentDigitIndex = 0; // 嵟弶偺寘傪慖戰
-        StartBlinkingOnCurrentDigit(); // 尰嵼偺寘傪揰柵偝偣傞
+        rightSideNumbers[correctCodeIndex].color = Color.red; // 正しい番号の色を赤に設定
+        StartBlinkingCorrectAnswer(); // 正しい番号を点滅させる
+        currentDigitIndex = 0; // 現在の数字のインデックスをリセット
+        StartBlinkingOnCurrentDigit(); // 現在の数字を点滅させる
     }
 
-    // 惓偟偄摎偊傪揰柵偝偣傞
+    // 正しい答えの点滅を開始
     private void StartBlinkingCorrectAnswer()
     {
         if (correctAnswerBlinkCoroutine != null)
         {
-            StopCoroutine(correctAnswerBlinkCoroutine); // 婛懚偺揰柵僐儖乕僠儞傪掆巭
+            StopCoroutine(correctAnswerBlinkCoroutine); // すでに実行中の点滅を止める
         }
 
-        correctAnswerBlinkCoroutine = StartCoroutine(BlinkCorrectAnswer()); // 怴偟偄揰柵僐儖乕僠儞傪奐巒
+        correctAnswerBlinkCoroutine = StartCoroutine(BlinkCorrectAnswer()); // 正しい答えの点滅を開始
     }
 
-    // 惓偟偄摎偊偑揰柵偡傞僐儖乕僠儞
+    // 正しい答えの点滅を実行するコルーチン
     IEnumerator BlinkCorrectAnswer()
     {
         while (true)
         {
-            yield return new WaitForSeconds(0.4f); // 0.4昩偛偲偵揰柵
-            rightSideNumbers[correctCodeIndex].color = (rightSideNumbers[correctCodeIndex].color == Color.red) ? Color.white : Color.red; // 愒偲敀傪愗傝懼偊
+            yield return new WaitForSeconds(0.4f); // 0.4秒待つ
+            rightSideNumbers[correctCodeIndex].color = (rightSideNumbers[correctCodeIndex].color == Color.red) ? Color.white : Color.red; // 赤と白を交互に点滅
         }
     }
 
-    // 億僢僾傾僢僾傪昞帵偡傞
+    // ポップアップを表示
     public void ShowPopUp()
     {
         if (!isPopUpActive)
         {
-            isPopUpActive = true; // 億僢僾傾僢僾傪昞帵忬懺偵偡傞
-            popUpPanel.SetActive(true); // 僷僱儖傪昞帵
+            isPopUpActive = true; // ポップアップをアクティブに設定
+            popUpPanel.SetActive(true); // ポップアップパネルを表示
         }
     }
 
-    // 億僢僾傾僢僾傪旕昞帵偵偡傞
+    // ポップアップを隠す
     public void HidePopUp()
     {
         if (isPopUpActive)
         {
-            isPopUpActive = false; // 億僢僾傾僢僾傪旕昞帵忬懺偵偡傞
-            popUpPanel.SetActive(false); // 僷僱儖傪旕昞帵
+            isPopUpActive = false; // ポップアップを非アクティブに設定
+            popUpPanel.SetActive(false); // ポップアップパネルを非表示
         }
     }
 
-    // 擖椡偝傟偨僐乕僪偑惓偟偄偐僠僃僢僋偡傞
+    // コードが正しいかチェック
     public bool CheckCode()
     {
-        bool codeMatches = true; // 僐乕僪偑堦抳偡傞偐偳偆偐
+        bool codeMatches = true; // コードが一致しているかどうか
 
         for (int i = 0; i < leftSideDigits.Length; i++)
         {
             int playerInputValue = 0;
-            if (int.TryParse(leftSideDigits[i].text, out playerInputValue)) // 擖椡偝傟偨抣傪惍悢偵曄姺
+            if (int.TryParse(leftSideDigits[i].text, out playerInputValue)) // プレイヤーの入力を整数に変換
             {
-                if (playerInputValue != correctCode[i]) // 惓偟偄僐乕僪偲斾妑
+                if (playerInputValue != correctCode[i]) // 正しいコードと一致しない場合
                 {
                     codeMatches = false;
                     break;
@@ -195,98 +194,98 @@ public class PopUpController : MonoBehaviour
 
         if (codeMatches)
         {
-            HidePopUp(); // 僐乕僪偑堦抳偟偨傜億僢僾傾僢僾傪旕昞帵偵偡傞
-            return true; // 惓偟偄僐乕僪
+            HidePopUp(); // コードが一致したらポップアップを隠す
+            return true; // コードが一致
         }
 
-        return false; // 僐乕僪偑堦抳偟側偄
+        return false; // コードが一致しない
     }
 
-    // 尰嵼偺寘偺悢帤傪憹傗偡
+    // 現在の数字を増やす
     public void IncreaseDigit(int index)
     {
         string currentText = leftSideDigits[index].text;
 
         if (int.TryParse(currentText, out int currentValue))
         {
-            currentValue = (currentValue + 1) % 10; // 1憹傗偡乮10偵側偭偨傜0偵栠傞乯
-            leftSideDigits[index].text = currentValue.ToString(); // 僥僉僗僩傪峏怴
-            digitAltered[index] = true; // 曄峏偝傟偨寘偲偟偰儅乕僋
+            currentValue = (currentValue + 1) % 10; // 数字を1増やす（0-9の範囲）
+            leftSideDigits[index].text = currentValue.ToString(); // 数字を表示
+            digitAltered[index] = true; // 数字が変更されたと設定
         }
 
-        CheckCode(); // 僐乕僪偑堦抳偡傞偐妋擣
-        UpdateDigitColors(); // 寘偺怓傪峏怴
+        CheckCode(); // コードが正しいか確認
+        UpdateDigitColors(); // 数字の色を更新
     }
 
-    // 尰嵼偺寘偺悢帤傪尭傜偡
+    // 現在の数字を減らす
     public void DecreaseDigit(int index)
     {
         string currentText = leftSideDigits[index].text;
 
         if (int.TryParse(currentText, out int currentValue))
         {
-            currentValue = (currentValue - 1 + 10) % 10; // 1尭傜偡乮0偵側偭偨傜9偵栠傞乯
-            leftSideDigits[index].text = currentValue.ToString(); // 僥僉僗僩傪峏怴
-            digitAltered[index] = true; // 曄峏偝傟偨寘偲偟偰儅乕僋
+            currentValue = (currentValue - 1 + 10) % 10; // 数字を1減らす（0-9の範囲）
+            leftSideDigits[index].text = currentValue.ToString(); // 数字を表示
+            digitAltered[index] = true; // 数字が変更されたと設定
         }
 
-        CheckCode(); // 僐乕僪偑堦抳偡傞偐妋擣
-        UpdateDigitColors(); // 寘偺怓傪峏怴
+        CheckCode(); // コードが正しいか確認
+        UpdateDigitColors(); // 数字の色を更新
     }
 
-    // 師偺寘偵堏摦偡傞
+    // 次の数字に移動
     public void MoveToNextDigit()
     {
-        StopActiveDigitBlink(); // 尰嵼偺寘偺揰柵傪巭傔傞
-        currentDigitIndex = (currentDigitIndex + 1) % leftSideDigits.Length; // 師偺寘偵堏摦
-        StartBlinkingOnCurrentDigit(); // 怴偟偄寘傪揰柵偝偣傞
+        StopActiveDigitBlink(); // 現在の数字の点滅を停止
+        currentDigitIndex = (currentDigitIndex + 1) % leftSideDigits.Length; // 次の数字に移動
+        StartBlinkingOnCurrentDigit(); // 新しい数字の点滅を開始
     }
 
-    // 慜偺寘偵堏摦偡傞
+    // 前の数字に移動
     public void MoveToPreviousDigit()
     {
-        StopActiveDigitBlink(); // 尰嵼偺寘偺揰柵傪巭傔傞
-        currentDigitIndex = (currentDigitIndex - 1 + leftSideDigits.Length) % leftSideDigits.Length; // 慜偺寘偵堏摦
-        StartBlinkingOnCurrentDigit(); // 怴偟偄寘傪揰柵偝偣傞
+        StopActiveDigitBlink(); // 現在の数字の点滅を停止
+        currentDigitIndex = (currentDigitIndex - 1 + leftSideDigits.Length) % leftSideDigits.Length; // 前の数字に移動
+        StartBlinkingOnCurrentDigit(); // 新しい数字の点滅を開始
     }
 
-    // 尰嵼偺寘傪揰柵偝偣傞
+    // 現在の数字の点滅を開始
     private void StartBlinkingOnCurrentDigit()
     {
         if (activeDigitBlinkCoroutine != null)
         {
-            StopCoroutine(activeDigitBlinkCoroutine); // 婛懚偺揰柵僐儖乕僠儞傪掆巭
+            StopCoroutine(activeDigitBlinkCoroutine); // すでに実行中の点滅を止める
         }
 
-        activeDigitBlinkCoroutine = StartCoroutine(BlinkActiveDigit()); // 怴偟偄揰柵僐儖乕僠儞傪奐巒
+        activeDigitBlinkCoroutine = StartCoroutine(BlinkActiveDigit()); // 現在の数字の点滅を開始
     }
 
-    // 尰嵼偺寘傪揰柵偝偣傞僐儖乕僠儞
+    // 現在の数字の点滅を停止
     private void StopActiveDigitBlink()
     {
         if (activeDigitBlinkCoroutine != null)
         {
-            StopCoroutine(activeDigitBlinkCoroutine); // 揰柵僐儖乕僠儞傪掆巭
-            leftSideDigits[currentDigitIndex].color = Color.white; // 怓傪尦偵栠偡
+            StopCoroutine(activeDigitBlinkCoroutine); // 点滅を停止
+            leftSideDigits[currentDigitIndex].color = Color.white; // 色を白に設定
         }
     }
 
-    // 尰嵼偺寘傪揰柵偝偣傞僐儖乕僠儞
+    // 現在の数字の点滅を実行するコルーチン
     IEnumerator BlinkActiveDigit()
     {
         while (true)
         {
-            yield return new WaitForSeconds(0.4f); // 0.4昩偛偲偵揰柵
-            leftSideDigits[currentDigitIndex].color = (leftSideDigits[currentDigitIndex].color == Color.black) ? Color.white : Color.black; // 崟偲敀傪愗傝懼偊
+            yield return new WaitForSeconds(0.4f); // 0.4秒待つ
+            leftSideDigits[currentDigitIndex].color = (leftSideDigits[currentDigitIndex].color == Color.black) ? Color.white : Color.black; // 黒と白を交互に点滅
         }
     }
 
-    // 寘偺怓傪峏怴偡傞
+    // 数字の色を更新
     private void UpdateDigitColors()
     {
         for (int i = 0; i < leftSideDigits.Length; i++)
         {
-            leftSideDigits[i].color = digitAltered[i] ? Color.white : Color.black; // 曄峏偝傟偨寘偼敀丄曄峏偝傟偰偄側偄寘偼崟
+            leftSideDigits[i].color = digitAltered[i] ? Color.white : Color.black; // 変更された数字の色を白、変更されていない数字の色を黒に設定
         }
     }
 }

@@ -1,143 +1,143 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI; // UI傪巊偆偨傔偵昁梫
+using UnityEngine.UI; // UIのためのライブラリ
 
 public class PlayerController : MonoBehaviour
 {
-    // 僾儗僀儎乕偺嵗昗傪儅僂僗偺埵抲偱寛傔傞偨傔偺曄悢
+    // マウス位置とワールド位置を保存するための変数
     Vector3 mousePos, worldPos;
 
-    [SerializeField] int maxPlayerHp = 100; // 嵟戝HP
-    private int playerHp; // 尰嵼偺HP
-    public Slider healthSlider; // UI偺僗儔僀僟乕偱HP傪昞帵
+    [SerializeField] int maxPlayerHp = 100; // 最大HP
+    private int playerHp; // 現在のHP
+    public Slider healthSlider; // UIのHPバー
 
-    [SerializeField] float maxPlayerMp = 100f; // 嵟戝MP
-    [SerializeField] float mpDecreaseRate = 5f; // MP偑枅昩尭傞検
-    private float currentPlayerMp; // 尰嵼偺MP
-    public Slider mpSlider; // UI偺僗儔僀僟乕偱MP傪昞帵
+    [SerializeField] float maxPlayerMp = 100f; // 最大MP
+    [SerializeField] float mpDecreaseRate = 5f; // MPが減る速度
+    private float currentPlayerMp; // 現在のMP
+    public Slider mpSlider; // UIのMPバー
 
-    public PopUpController popUpController; // 億僢僾傾僢僾昞帵傪惂屼偡傞僋儔僗
-    [SerializeField] float mpIncreaseInterval = 1f; // MP偑憹壛偡傞娫妘乮昩乯
-    [SerializeField] int mpIncreaseAmount = 1; // 1夞偺MP憹壛検
-    [SerializeField] float popUpChance = 0.1f; // 億僢僾傾僢僾偑昞帵偝傟傞妋棪乮0.0 - 1.0乯
+    public PopUpController popUpController; // ポップアップを表示するコントローラー
+    [SerializeField] float mpIncreaseInterval = 1f; // MPが回復する時間間隔
+    [SerializeField] int mpIncreaseAmount = 1; // 1回のMP回復量
+    [SerializeField] float popUpChance = 0.1f; // ポップアップが表示される確率（0.0 - 1.0）
 
-    private bool isPopUpWaiting = false;
+    private bool isPopUpWaiting = false; // ポップアップが待機中かどうかのフラグ
 
-    // 僎乕儉奐巒帪偵屇偽傟傞
+    // ゲーム開始時に1回だけ実行される
     void Start()
     {
-        playerHp = maxPlayerHp; // 僾儗僀儎乕偺HP傪嵟戝偵愝掕
-        currentPlayerMp = maxPlayerMp; // 僾儗僀儎乕偺MP傪嵟戝偵愝掕
+        playerHp = maxPlayerHp; // プレイヤーのHPを最大値に設定
+        currentPlayerMp = maxPlayerMp; // プレイヤーのMPを最大値に設定
 
-        // HP僗儔僀僟乕傪弶婜壔乮UI偵昞帵乯
+        // HPバーの設定
         if (healthSlider != null)
         {
-            healthSlider.maxValue = maxPlayerHp; // HP僗儔僀僟乕偺嵟戝抣傪愝掕
-            healthSlider.value = playerHp; // 尰嵼偺HP僗儔僀僟乕偺抣傪愝掕
+            healthSlider.maxValue = maxPlayerHp; // HPバーの最大値を設定
+            healthSlider.value = playerHp; // 現在のHPをバーに設定
         }
 
-        // MP僗儔僀僟乕傪弶婜壔乮UI偵昞帵乯
+        // MPバーの設定
         if (mpSlider != null)
         {
-            mpSlider.maxValue = maxPlayerMp; // MP僗儔僀僟乕偺嵟戝抣傪愝掕
-            mpSlider.value = currentPlayerMp; // 尰嵼偺MP僗儔僀僟乕偺抣傪愝掕
+            mpSlider.maxValue = maxPlayerMp; // MPバーの最大値を設定
+            mpSlider.value = currentPlayerMp; // 現在のMPをバーに設定
         }
 
-        // MP傪帪娫宱夁偱憹壛偝偣傞僐儖乕僠儞傪奐巒
+        // 一定時間ごとにMPを回復する処理を開始
         StartCoroutine(IncreaseMpOverTime());
     }
 
-    // 枅僼儗乕儉屇偽傟傞
+    // 毎フレーム実行される
     void Update()
     {
-        // 儅僂僗偺嵗昗傪庢摼
+        // マウスの位置を取得
         mousePos = Input.mousePosition;
 
-        // 僗僋儕乕儞嵗昗傪儚乕儖僪嵗昗偵曄姺
+        // マウスのスクリーン座標をワールド座標に変換
         worldPos = Camera.main.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 10f));
 
-        // 僾儗僀儎乕偺埵抲傪儅僂僗偺埵抲偵愝掕
+        // プレイヤーの位置をマウスの位置に合わせる
         transform.position = worldPos;
 
-        // 傕偟嵍僋儕僢僋偑墴偝傟偨傜
+        // マウスの左クリックでMPを減らす
         if (Input.GetMouseButtonDown(0))
         {
-            ReduceMp(); // MP傪尭傜偡
+            ReduceMp(); // MPを減らす
         }
     }
 
-    // 僾儗僀儎乕偵僟儊乕僕傪梌偊傞娭悢
+    // ダメージを受けたときに呼ばれる
     public void AddDamage(int damage)
     {
-        maxPlayerHp -= damage; // 嵟戝HP傪僟儊乕僕暘尭傜偡
+        maxPlayerHp -= damage; // HPを減らす
 
-        // HP偑0枹枮偵側傜側偄傛偆偵惂尷
+        // HPが0以下にならないように制限
         playerHp = Mathf.Clamp(playerHp, 0, maxPlayerHp);
 
-        // HP僗儔僀僟乕傪峏怴
+        // HPバーを更新
         if (healthSlider != null)
         {
             healthSlider.value = playerHp;
         }
     }
 
-    // MP傪尭傜偡娭悢
+    // MPを減らす処理
     void ReduceMp()
     {
-        // MP傪尭彮偝偣丄0枹枮偵側傜側偄傛偆偵惂尷
+        // MPが0以下にならないように制限
         currentPlayerMp = Mathf.Clamp(currentPlayerMp - mpDecreaseRate, 0, maxPlayerMp);
 
-        // MP僗儔僀僟乕傪峏怴
+        // MPバーを更新
         if (mpSlider != null)
         {
             mpSlider.value = currentPlayerMp;
         }
     }
 
-    // MP傪憹壛偝偣傞娭悢
+    // MPを回復する処理
     void IncreaseMp()
     {
-        // MP傪憹壛偝偣丄嵟戝抣傪挻偊側偄傛偆偵惂尷
+        // MPが最大値を超えないように制限
         currentPlayerMp = Mathf.Min(currentPlayerMp + mpIncreaseAmount, maxPlayerMp);
 
-        // MP僗儔僀僟乕傪峏怴
+        // MPバーを更新
         if (mpSlider != null)
         {
             mpSlider.value = currentPlayerMp;
         }
     }
 
-    // MP傪帪娫宱夁偱憹壛偝偣傞僐儖乕僠儞
+    // 一定時間ごとにMPを回復するコルーチン
     IEnumerator IncreaseMpOverTime()
     {
-        while (true) // 柍尷儖乕僾偱MP傪憹壛偝偣傞
+        Debug.Log("MP Recovery Coroutine Started!");
+        while (true) // 無限ループでMPを回復
         {
-            //if (!isPopUpWaiting)
-            //{
-                // MP傪憹壛偝偣傞
-                IncreaseMp();
-
-                // 傕偟MP偑嵟戝抣枹枮偱丄儔儞僟儉側妋棪偱億僢僾傾僢僾傪昞帵
-                if (currentPlayerMp < maxPlayerMp && Random.value <= popUpChance)
-                {
-                    // 億僢僾傾僢僾偑昞帵偝傟傞僠儍儞僗偑棃偨傜
-                    if (popUpController != null)
-                    {
-                        popUpController.StartRandomPopUpCoroutine(true); // 億僢僾傾僢僾傪奐巒
-                        isPopUpWaiting = true;
-                    }
-                }
-            //}
-            // 巜掕偟偨帪娫偩偗懸偮
+            // MPを回復
+            IncreaseMp();
             yield return new WaitForSeconds(mpIncreaseInterval);
+
+            // MPが最大ではなく、ポップアップの確率に基づいてポップアップを表示
+            if (currentPlayerMp < maxPlayerMp && Random.value <= popUpChance)
+            {
+                // ポップアップを表示
+                if (popUpController != null)
+                {
+                    popUpController.StartRandomPopUpCoroutine(true); // ポップアップを表示
+                    isPopUpWaiting = true;
+                }
+            }
+
+            // 次の回復まで待機
+            yield return new WaitForSeconds(mpIncreaseInterval);
+
+            // ポップアップ待機中のフラグが立っていれば、20秒後にリセット
             if (isPopUpWaiting)
             {
-                yield return new WaitForSeconds(20f); // Wait for 20 seconds
-                isPopUpWaiting = false; // Reset the flag to allow another pop-up
+                yield return new WaitForSeconds(20f); // 20秒待つ
+                isPopUpWaiting = false; // フラグをリセットして、次のポップアップを許可
             }
-            
         }
     }
-
 }

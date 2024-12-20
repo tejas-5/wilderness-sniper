@@ -1607,8 +1607,8 @@ MonoBehaviour:
   mpDecreaseRate: 5
   mpSlider: {fileID: 126121537}
   popUpController: {fileID: 1278543434}
-  mpIncreaseInterval: 1
-  mpIncreaseAmount: 10
+  mpIncreaseInterval: 0.1
+  mpIncreaseAmount: 1
   popUpChance: 0.1
 --- !u!212 &798793881
 SpriteRenderer:

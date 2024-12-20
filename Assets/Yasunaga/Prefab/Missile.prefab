@@ -188,7 +188,7 @@ MonoBehaviour:
   targetY: 6.2
   fallSpeed: 1
   scaleSpeed: 0.2
-  maxSize: 2.3
+  maxSize: 2.5
   scoreValue: 50
   damage: 10
 --- !u!70 &-7761472220790493950

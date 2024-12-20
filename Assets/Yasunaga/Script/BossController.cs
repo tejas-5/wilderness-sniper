@@ -6,7 +6,7 @@ public class BossController : MonoBehaviour
 {
     //ボス移動
     private Vector2 pos;
-    [SerializeField] int num = 1;//方向
+    private int num = 1;//方向
     [SerializeField] int moveSpeed = 3;
 
     //ボススポーン
@@ -29,7 +29,7 @@ public class BossController : MonoBehaviour
     [SerializeField] Transform teal;
 
     //パラメーター
-    [SerializeField] int bossHp = 15;
+    [SerializeField] int bossHp = 20;
     [SerializeField] int hitDamage = 1;
     [SerializeField] int scoreValue = 150; // この敵を倒した時のスコア
     private ScoreManager scoreManager;

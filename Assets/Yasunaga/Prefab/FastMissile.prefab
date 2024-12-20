@@ -99,8 +99,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af5b8424bf845944686f7f6cac9df263, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scaleSpeed: 0.7
-  maxSize: 2
+  scaleSpeed: 0.3
+  maxSize: 2.3
   scoreValue: 50
   damage: 10
 --- !u!70 &7434408598866489191

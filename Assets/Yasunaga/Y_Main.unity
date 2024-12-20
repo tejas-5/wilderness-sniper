@@ -2312,7 +2312,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1626275197}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Teal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2781,12 +2781,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56334dc021b8c404789e0165ef6582a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+<<<<<<< Updated upstream
   moveSpeed: 3
   spawnDelay: 1
   startPosition: {x: 0, y: 9, z: 0}
   endPosition: {x: 0, y: 1.5, z: 0}
   moveDuration: 0.3
   missileDelay: 3
+=======
+  num: 1
+  moveSpeed: 3
+  spawnDelay: 3
+  startPosition: {x: 0, y: 9, z: 0}
+  endPosition: {x: 0, y: 1.5, z: 0}
+  moveDuration: 0.3
+  missileDelay: 5
+>>>>>>> Stashed changes
   missilePrefab: {fileID: 4661706653759405584, guid: 1268ba052e903404a9e5fcec4bff41d0, type: 3}
   armInterval: 3
   rightArm: {fileID: 297195146}

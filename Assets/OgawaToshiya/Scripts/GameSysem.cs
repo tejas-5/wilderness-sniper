@@ -12,7 +12,7 @@ public class GameSysem : MonoBehaviour
     // スタートボタンを押したら実行する
     public void StartGame()
     {
-        SceneManager.LoadScene("Scene_ot");
+        SceneManager.LoadScene("Y_Main");
     }
 
     // Optionボタンを押したら実行する

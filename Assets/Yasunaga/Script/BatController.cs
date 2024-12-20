@@ -4,48 +4,45 @@ using UnityEngine;
 
 public class BatController : MonoBehaviour
 {
+    //飛行移動
     private float xRadius = 3.0f;  // X方向の半径
     private float yRadius = 1.0f;  // Y方向の半径
     private float duration = 1.25f; // 楕円の片道移動にかける時間（秒）
     private Vector2 centerPosition; // 楕円の中心位置
 
+    //近づく
     [SerializeField] float scaleSpeed = 0.3f; // スケールの速度
     private Vector3 firstScale;    // 初期スケール
     [SerializeField] float maxSize = 2.0f;     // 最大サイズ
 
-    [SerializeField] int scoreValue = 50; // この敵を倒した時のスコア
+    //パラメーター
     private ScoreManager scoreManager;
+    [SerializeField] int scoreValue = 50; // この敵を倒した時のスコア
     [SerializeField] int damage = 10; //受けるダメージ
     private PlayerController playerController;
 
     void Start()
     {
-        // オブジェクトの初期位置を中心として設定
         centerPosition = transform.position;
+        firstScale = transform.localScale; 
 
-        // コルーチン開始
         StartCoroutine(MoveBat());
 
-        firstScale = transform.localScale; // 初期スケールを取得
-
-        // スコアマネージャーのオブジェクトを取得
         scoreManager = GameObject.Find("ScoreManager").GetComponent<ScoreManager>();
-
         playerController = GameObject.Find("Player").GetComponent<PlayerController>();
     }
-
+    //飛行移動
     IEnumerator MoveBat()
     {
         while (true)
         {
             // 順方向の楕円を描く
             yield return StartCoroutine(EllipseMotion(0.0f, 180.0f));
-
             // 逆方向の楕円を描く（元の位置に戻る）
             yield return StartCoroutine(EllipseMotion(180.0f, 0.0f));
         }
     }
-
+    //楕円移動
     IEnumerator EllipseMotion(float startAngle, float endAngle)
     {
         float angle = startAngle;
@@ -67,7 +64,7 @@ public class BatController : MonoBehaviour
             yield return null;
         }
     }
-
+    //近づく
     private void Update()
     {
         // スケールを徐々に大きくする

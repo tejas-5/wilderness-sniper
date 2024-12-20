@@ -18,7 +18,6 @@ public class BossArmController : MonoBehaviour
         {
             Die();
         }
-        Debug.Log(armHp);
     }
     void OnMouseDown()
     {

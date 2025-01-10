@@ -4,5 +4,14 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/OgawaToshiya/Scene/StartScene.unity
+    guid: f910e7b70c9c9cf45bc1f226c2f60c6f
+  - enabled: 1
+    path: Assets/Yasunaga/Y_Main.unity
+    guid: ea774217fa144a34eb44b13440111eff
+  - enabled: 1
+    path: Assets/OgawaToshiya/Scene/OptionScene.unity
+    guid: 25be8c30c77a882478013f74f6447f75
   m_configObjects: {}

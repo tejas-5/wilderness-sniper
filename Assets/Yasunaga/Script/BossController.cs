@@ -17,7 +17,7 @@ public class BossController : MonoBehaviour
 
     //ハサミからの攻撃
     private bool isArmAttack = true; // 生成を制御するフラグ
-    [SerializeField] float missileDelay = 62f;　//ミサイル発射までの時間
+    [SerializeField] float missileDelay = 62f;//ミサイル発射までの時間
     [SerializeField] GameObject missilePrefab;
     [SerializeField] float armInterval = 3f; // オブジェクトを生成する間隔（秒）
     [SerializeField] Transform rightArm;

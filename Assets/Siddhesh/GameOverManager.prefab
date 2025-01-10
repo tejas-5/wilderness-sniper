@@ -45,3 +45,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameOverPanel: {fileID: 7149061184357699890, guid: 10c687a52b047a847a85ea1495d9c0f9, type: 3}
+  gameClearSound: {fileID: 8300000, guid: 046b794ea413c87449f308d2262d1366, type: 3}

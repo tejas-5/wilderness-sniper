@@ -6,11 +6,7 @@ public class BossController : MonoBehaviour
 {
     //ボス移動
     private Vector2 pos;
-
-    
-
-    [SerializeField] int num = 1;//方向
-
+    private int num = 1;//方向
     [SerializeField] int moveSpeed = 3;
 
     //ボススポーン
@@ -20,11 +16,7 @@ public class BossController : MonoBehaviour
     [SerializeField] float moveDuration = 0.3f; //最終位置移動までかかる時間
 
     //ハサミからの攻撃
-
-    private bool isSpawning = true; // 生成を制御するフラグ
-
     private bool isArmAttack = true; // 生成を制御するフラグ
-
     [SerializeField] float missileDelay = 62f;　//ミサイル発射までの時間
     [SerializeField] GameObject missilePrefab;
     [SerializeField] float armInterval = 3f; // オブジェクトを生成する間隔（秒）
@@ -37,11 +29,7 @@ public class BossController : MonoBehaviour
     [SerializeField] Transform teal;
 
     //パラメーター
-
     [SerializeField] int bossHp = 20;
-
-    
-
     [SerializeField] int hitDamage = 1;
     [SerializeField] int scoreValue = 150; // この敵を倒した時のスコア
     private ScoreManager scoreManager;
@@ -66,7 +54,7 @@ public class BossController : MonoBehaviour
         if (pos.x > 5.5) num = -1;
         if (pos.x < -5.5) num = 1;
 
-        //if (bossHp == 0) Die();
+        if (bossHp == 0) Die();
     }
 
     //ボススポーン
@@ -86,7 +74,6 @@ public class BossController : MonoBehaviour
             yield return null; 
 
         }
-
         //最終位置を設定
         transform.position = endPosition;
     }
@@ -152,17 +139,13 @@ public class BossController : MonoBehaviour
         {
             if (teal != null)
                 Instantiate(fastMissilePrefab, teal.position, teal.rotation);
-        }
-        void OnMouseDown()
-        {
-            bossHp -= hitDamage;
-        }
-        void Die()
-        {
-            // スコアを加算
-            scoreManager.AddScore(scoreValue);
+        }   
+    }
+    void Die()
+    {
+        // スコアを加算
+        scoreManager.AddScore(scoreValue);
 
-            Destroy(gameObject);
-        }
+        Destroy(gameObject);
     }
 }

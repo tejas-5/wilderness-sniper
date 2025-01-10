@@ -6,16 +6,23 @@ public class GameManager : MonoBehaviour
 {
     public GameObject gameOverPanel;
 
+    [SerializeField] AudioClip gameClearSound;
+    private AudioSource audioSource;
+
     private void Start()
     {
         // Hide GameOverPanel initially
         gameOverPanel.SetActive(false);
+        audioSource = GetComponent<AudioSource>();
     }
 
     public void GameOver()
     {
         // Display the GameOverPanel when the player loses
         gameOverPanel.SetActive(true);
+
+        // Play the gameClearSound when the GameOverPanel is activated
+        audioSource.PlayOneShot(gameClearSound);
     }
 
     public void RestartGame()

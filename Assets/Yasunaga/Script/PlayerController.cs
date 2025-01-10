@@ -65,6 +65,13 @@ public class PlayerController : MonoBehaviour
         {
             ReduceMp(); // MP§Úúp§È§π
         }
+
+        //
+        if (playerHp <= 0)
+        {
+            // Call Game Over when health is zero
+            FindObjectOfType<GameManager>().GameOver();
+        }
     }
 
     // •¿•·©`•∏§Ú ‹§±§ø§»§≠§À∫Ù§–§ÅEÅE

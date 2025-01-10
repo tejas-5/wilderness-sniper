@@ -6,11 +6,11 @@ public class BossController : MonoBehaviour
 {
     //ボス移動
     private Vector2 pos;
-<<<<<<< Updated upstream
-    private int num = 1;//方向
-=======
+
+    
+
     [SerializeField] int num = 1;//方向
->>>>>>> Stashed changes
+
     [SerializeField] int moveSpeed = 3;
 
     //ボススポーン
@@ -20,11 +20,11 @@ public class BossController : MonoBehaviour
     [SerializeField] float moveDuration = 0.3f; //最終位置移動までかかる時間
 
     //ハサミからの攻撃
-<<<<<<< Updated upstream
+
     private bool isSpawning = true; // 生成を制御するフラグ
-=======
+
     private bool isArmAttack = true; // 生成を制御するフラグ
->>>>>>> Stashed changes
+
     [SerializeField] float missileDelay = 62f;　//ミサイル発射までの時間
     [SerializeField] GameObject missilePrefab;
     [SerializeField] float armInterval = 3f; // オブジェクトを生成する間隔（秒）
@@ -37,11 +37,11 @@ public class BossController : MonoBehaviour
     [SerializeField] Transform teal;
 
     //パラメーター
-<<<<<<< Updated upstream
+
     [SerializeField] int bossHp = 20;
-=======
-    [SerializeField] int bossHp = 15;
->>>>>>> Stashed changes
+
+    
+
     [SerializeField] int hitDamage = 1;
     [SerializeField] int scoreValue = 150; // この敵を倒した時のスコア
     private ScoreManager scoreManager;
@@ -66,7 +66,7 @@ public class BossController : MonoBehaviour
         if (pos.x > 5.5) num = -1;
         if (pos.x < -5.5) num = 1;
 
-        if (bossHp == 0) Die();
+        //if (bossHp == 0) Die();
     }
 
     //ボススポーン
@@ -80,11 +80,11 @@ public class BossController : MonoBehaviour
         {
             transform.position = Vector3.Lerp(startPosition, endPosition, elapsedTime / moveDuration);
             elapsedTime += Time.deltaTime;
-<<<<<<< Updated upstream
+
             yield return null;
-=======
+
             yield return null; 
->>>>>>> Stashed changes
+
         }
 
         //最終位置を設定
@@ -134,34 +134,35 @@ public class BossController : MonoBehaviour
     //尻尾攻撃
     private IEnumerator TealAttack()
     {
-<<<<<<< Updated upstream
+
         while (isTealAttack)
         {
             TealMissile();
             yield return new WaitForSeconds(tealInterval);
-=======
-        while (isTealAttack) 
-        {
-            TealMissile();
-            yield return new WaitForSeconds(tealInterval); 
->>>>>>> Stashed changes
-        }
-    }
-    //尻尾ミサイル
-    void TealMissile()
-    {
-        if (teal != null)
-            Instantiate(fastMissilePrefab, teal.position, teal.rotation);
-    }
-    void OnMouseDown()
-    {
-        bossHp -= hitDamage;
-    }
-    public void Die()
-    {
-        // スコアを加算
-        scoreManager.AddScore(scoreValue);
 
-        Destroy(gameObject);
+            while (isTealAttack)
+            {
+                TealMissile();
+                yield return new WaitForSeconds(tealInterval);
+
+            }
+        }
+        //尻尾ミサイル
+        void TealMissile()
+        {
+            if (teal != null)
+                Instantiate(fastMissilePrefab, teal.position, teal.rotation);
+        }
+        void OnMouseDown()
+        {
+            bossHp -= hitDamage;
+        }
+        void Die()
+        {
+            // スコアを加算
+            scoreManager.AddScore(scoreValue);
+
+            Destroy(gameObject);
+        }
     }
 }

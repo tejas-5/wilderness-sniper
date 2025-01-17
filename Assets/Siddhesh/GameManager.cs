@@ -14,6 +14,10 @@ public class GameManager : MonoBehaviour
         // Hide GameOverPanel initially
         gameOverPanel.SetActive(false);
         audioSource = GetComponent<AudioSource>();
+        if (gameOverPanel == null)
+        {
+            Debug.LogWarning("GameOverPanel‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
+        }
     }
 
     public void GameOver()

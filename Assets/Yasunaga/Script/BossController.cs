@@ -159,7 +159,7 @@ public class BossController : MonoBehaviour
         // GameOverを呼び出す
         if (gameManager != null)
         {
-            Debug.Log("GameManagerのGameOverメソッドを呼び出します。");
+            //Debug.Log("GameManagerのGameOverメソッドを呼び出します。");
             gameManager.GameOver();
         }
         else

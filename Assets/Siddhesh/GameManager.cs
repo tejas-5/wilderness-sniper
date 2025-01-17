@@ -25,6 +25,8 @@ public class GameManager : MonoBehaviour
         isGameOver = true; // Set the flag to true
         gameOverPanel.SetActive(true);
 
+        Time.timeScale = 0f;
+
         // Play the gameClearSound with adjustable volume
         if (gameClearSound != null)
         {
@@ -40,6 +42,8 @@ public class GameManager : MonoBehaviour
     {
         // Reset the flag when restarting the game
         isGameOver = false;
+
+        Time.timeScale = 1f;
 
         // Restart the current scene (reload the level)
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);

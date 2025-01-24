@@ -22,6 +22,8 @@ public class PopUpController : MonoBehaviour
 
     private bool isPopUpActive = false; // ポップアップがアクティブかどうか
 
+    public GameObject errorCodePanel;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -286,6 +288,18 @@ public class PopUpController : MonoBehaviour
         for (int i = 0; i < leftSideDigits.Length; i++)
         {
             leftSideDigits[i].color = digitAltered[i] ? Color.white : Color.black; // 変更された数字の色を白、変更されていない数字の色を黒に設定
+        }
+    }
+
+    public void ClosePopUp()
+    {
+        if (errorCodePanel != null)
+        {
+            errorCodePanel.SetActive(false);  // Hides the ErrorCode panel
+        }
+        else
+        {
+            Debug.LogWarning("ErrorCode panel is not assigned in the PopUpController!");
         }
     }
 }

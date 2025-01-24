@@ -19,12 +19,14 @@ public class PlayerController : MonoBehaviour
 
     public PopUpController popUpController; 
     [SerializeField] float mpIncreaseInterval = 1f; 
-    [SerializeField] int mpIncreaseAmount = 1; 
+    [SerializeField] float mpIncreaseAmount = 1; 
     [SerializeField] float popUpChance = 0.1f; 
 
-    private bool isPopUpWaiting = false; 
+    private bool isPopUpWaiting = false;
 
-    
+    public GameObject gameOverPanel;
+    public GameObject errorCodePanel;
+
     void Start()
     {
         playerHp = maxPlayerHp; 
@@ -48,31 +50,29 @@ public class PlayerController : MonoBehaviour
         StartCoroutine(IncreaseMpOverTime());
     }
 
-    
+
     void Update()
     {
-        
+        if (gameOverPanel.activeSelf || errorCodePanel.activeSelf)
+        {
+            return; // Disable input when a panel is active
+        }
+        // Player movement logic
         mousePos = Input.mousePosition;
-
-        
         worldPos = Camera.main.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 10f));
-
-        
         transform.position = worldPos;
+
         if (Input.GetMouseButtonDown(0))
         {
-            ReduceMp(); 
+            ReduceMp();
         }
 
-        
         if (playerHp <= 0)
         {
-            
             FindObjectOfType<GameManager>().GameOver();
         }
     }
 
-    
     public void AddDamage(int damage)
     {
         maxPlayerHp -= damage; 
@@ -125,12 +125,15 @@ public class PlayerController : MonoBehaviour
             
             if (currentPlayerMp < maxPlayerMp && Random.value <= popUpChance)
             {
-                
-                if (popUpController != null)
+                if (playerHp > 10)
                 {
-                    popUpController.StartRandomPopUpCoroutine(true);
-                    isPopUpWaiting = true;
+                    if (popUpController != null)
+                    {
+                        popUpController.StartRandomPopUpCoroutine(true);
+                        isPopUpWaiting = true;
+                    }
                 }
+                   
             }
 
             

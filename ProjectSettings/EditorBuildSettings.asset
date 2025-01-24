@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Siddhesh/New Scene.unity
+    guid: f0fee9406b1427147b500c31d1679f74
+  - enabled: 1
     path: Assets/Yasunaga/Y_Main.unity
     guid: ea774217fa144a34eb44b13440111eff
   m_configObjects: {}

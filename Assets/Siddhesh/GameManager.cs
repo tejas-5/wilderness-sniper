@@ -11,6 +11,10 @@ public class GameManager : MonoBehaviour
 
     private bool isGameOver = false; // Flag to prevent multiple calls to GameOver
 
+    public PopUpController popUpController;  // Reference to the PopUpController
+    public GameObject errorCodePanel;  // Reference to the ErrorCode Panel
+
+
     private void Start()
     {
         // Hide GameOverPanel initially
@@ -18,7 +22,7 @@ public class GameManager : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         if (gameOverPanel == null)
         {
-            Debug.LogWarning("GameOverPanelÇ™ê›íËÇ≥ÇÍÇƒÇ¢Ç‹ÇπÇÒÅB");
+            Debug.LogWarning("GameOverPanel");
         }
     }
 
@@ -28,6 +32,17 @@ public class GameManager : MonoBehaviour
 
         isGameOver = true; // Set the flag to true
         gameOverPanel.SetActive(true);
+
+        // Check if popUpController is assigned before calling ClosePopUp
+        if (popUpController != null)
+        {
+            Debug.Log("Closing PopUp");
+            popUpController.ClosePopUp(); // Close the pop-up
+        }
+        else
+        {
+            Debug.LogWarning("PopUpController is not assigned in GameManager!");
+        }
 
         Time.timeScale = 0f;
 
@@ -41,6 +56,7 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("GameClearSound is not assigned in the GameManager script!");
         }
     }
+
 
     public void RestartGame()
     {
@@ -58,4 +74,14 @@ public class GameManager : MonoBehaviour
         // Quit the application (useful in a build)
         Application.Quit();
     }
+
+    public void ClosePopUp()
+    {
+        // Assuming the error code panel is a UI element (like a GameObject)
+        if (errorCodePanel != null)
+        {
+            errorCodePanel.SetActive(false);
+        }
+    }
+
 }

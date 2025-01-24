@@ -32,6 +32,10 @@ public class BossArmController : MonoBehaviour
 
     void OnMouseDown()
     {
+        if (GameManager.Instance.AnyScreenEnabled())
+        {
+            return;
+        }
         // armHp ‚ðŒ¸‚ç‚·
         armHp = Mathf.Max(armHp - 1, 0);
     }

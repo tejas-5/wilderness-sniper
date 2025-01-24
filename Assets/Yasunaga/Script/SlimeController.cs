@@ -56,6 +56,10 @@ public class SlimeController : MonoBehaviour
 
     void OnMouseDown()
     {
+        if (GameManager.Instance.AnyScreenEnabled())
+        {
+            return;
+        }
         Die();
     }
 

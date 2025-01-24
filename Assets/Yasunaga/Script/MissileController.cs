@@ -76,6 +76,10 @@ public class MissileController : MonoBehaviour
 
     void OnMouseDown()
     {
+        if (GameManager.Instance.AnyScreenEnabled())
+        {
+            return;
+        }
         Die();
     }
 

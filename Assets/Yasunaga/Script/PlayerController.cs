@@ -1,26 +1,28 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI; 
+using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class PlayerController : MonoBehaviour
 {
-    
+
     Vector3 mousePos, worldPos;
 
-    [SerializeField] int maxPlayerHp = 100; 
-    private int playerHp; 
-    public Slider healthSlider; 
+    [SerializeField] int maxPlayerHp = 100;
+    private int playerHp;
+    public Slider healthSlider;
 
-    [SerializeField] float maxPlayerMp = 100f; 
-    [SerializeField] float mpDecreaseRate = 5f; 
-    private float currentPlayerMp; 
-    public Slider mpSlider; 
+    [SerializeField] float maxPlayerMp = 100f;
+    [SerializeField] float mpDecreaseRate = 5f;
+    private float currentPlayerMp;
+    public Slider mpSlider;
 
-    public PopUpController popUpController; 
-    [SerializeField] float mpIncreaseInterval = 1f; 
-    [SerializeField] float mpIncreaseAmount = 1; 
-    [SerializeField] float popUpChance = 0.1f; 
+    public PopUpController popUpController;
+    [SerializeField] float mpIncreaseInterval = 1f;
+    [SerializeField] float mpIncreaseAmount = 1;
+    [SerializeField] float popUpChance = 0.1f;
 
     private bool isPopUpWaiting = false;
 
@@ -29,34 +31,30 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        playerHp = maxPlayerHp; 
-        currentPlayerMp = maxPlayerMp; 
+        playerHp = maxPlayerHp;
+        currentPlayerMp = maxPlayerMp;
+         
 
-        
         if (healthSlider != null)
         {
-            healthSlider.maxValue = maxPlayerHp; 
-            healthSlider.value = playerHp; 
+            healthSlider.maxValue = maxPlayerHp;
+            healthSlider.value = playerHp;
         }
 
-        
+
         if (mpSlider != null)
         {
             mpSlider.maxValue = maxPlayerMp;
             mpSlider.value = currentPlayerMp;
         }
 
-        
         StartCoroutine(IncreaseMpOverTime());
     }
 
 
     void Update()
     {
-        if (gameOverPanel.activeSelf || errorCodePanel.activeSelf)
-        {
-            return; // Disable input when a panel is active
-        }
+      
         // Player movement logic
         mousePos = Input.mousePosition;
         worldPos = Camera.main.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 10f));
@@ -73,11 +71,12 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+
     public void AddDamage(int damage)
     {
-        maxPlayerHp -= damage; 
+        maxPlayerHp -= damage;
 
-       
+
         playerHp = Mathf.Clamp(playerHp, 0, maxPlayerHp);
 
 
@@ -89,62 +88,59 @@ public class PlayerController : MonoBehaviour
 
     void ReduceMp()
     {
-        
+        if (GameManager.Instance.AnyScreenEnabled())
+        {
+            return;
+        }
         currentPlayerMp = Mathf.Clamp(currentPlayerMp - mpDecreaseRate, 0, maxPlayerMp);
 
-        
+
         if (mpSlider != null)
         {
             mpSlider.value = currentPlayerMp;
         }
     }
 
-    
+
     void IncreaseMp()
     {
-        
+
         currentPlayerMp = Mathf.Min(currentPlayerMp + mpIncreaseAmount, maxPlayerMp);
 
-        
         if (mpSlider != null)
         {
             mpSlider.value = currentPlayerMp;
         }
     }
 
-    
+
     IEnumerator IncreaseMpOverTime()
     {
-        Debug.Log("MP Recovery Coroutine Started!");
-        while (true) 
+        while (true)
         {
-            
+            // Increase MP
             IncreaseMp();
-            yield return new WaitForSeconds(mpIncreaseInterval);
 
-            
+            // Check if a pop-up should be triggered
             if (currentPlayerMp < maxPlayerMp && Random.value <= popUpChance)
             {
-                if (playerHp > 10)
+                if (playerHp > 10 && popUpController != null)
                 {
-                    if (popUpController != null)
-                    {
-                        popUpController.StartRandomPopUpCoroutine(true);
-                        isPopUpWaiting = true;
-                    }
+                    popUpController.StartRandomPopUpCoroutine(true);
+                    isPopUpWaiting = true;
+
+                    // Wait for the pop-up to be resolved
+                    yield return new WaitUntil(() => !isPopUpWaiting);
                 }
-                   
             }
 
-            
+            // Wait for the next MP increase interval
             yield return new WaitForSeconds(mpIncreaseInterval);
-
-            
-            if (isPopUpWaiting)
-            {
-                yield return new WaitForSeconds(20f); 
-                isPopUpWaiting = false; 
-            }
         }
+    }
+
+    public void SetPopUpWaiting(bool waiting)
+    {
+        isPopUpWaiting = waiting;
     }
 }

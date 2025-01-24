@@ -148,6 +148,10 @@ public class BossController : MonoBehaviour
 
     void OnMouseDown()
     {
+        if (GameManager.Instance.AnyScreenEnabled())
+        {
+            return;
+        }
         bossHp -= hitDamage;
     }
 

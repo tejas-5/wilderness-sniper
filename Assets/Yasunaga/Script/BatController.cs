@@ -25,10 +25,12 @@ public class BatController : MonoBehaviour
     private Renderer objectRenderer; // オブジェクトのRenderer
     private bool isFlashing = false; // 点滅中かどうか
 
+    [SerializeField] private GameObject panel;
+
     void Start()
     {
         centerPosition = transform.position;
-        firstScale = transform.localScale; 
+        firstScale = transform.localScale;
 
         StartCoroutine(MoveBat());
 
@@ -111,6 +113,10 @@ public class BatController : MonoBehaviour
     }
     void OnMouseDown()
     {
+        if (GameManager.Instance.AnyScreenEnabled())
+        {
+            return;
+        }
         Die();
     }
 

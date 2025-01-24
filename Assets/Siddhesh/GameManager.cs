@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -14,6 +15,22 @@ public class GameManager : MonoBehaviour
     public PopUpController popUpController;  // Reference to the PopUpController
     public GameObject errorCodePanel;  // Reference to the ErrorCode Panel
 
+
+    public static GameManager Instance { get; private set; }
+
+    private void Awake()
+    {
+        // If there is an instance, and it's not me, delete myself.
+
+        if (Instance != null && Instance != this)
+        {
+            Destroy(this);
+        }
+        else
+        {
+            Instance = this;
+        }
+    }
 
     private void Start()
     {
@@ -82,6 +99,23 @@ public class GameManager : MonoBehaviour
         {
             errorCodePanel.SetActive(false);
         }
+    }
+
+    public bool IsErrorScreenEnabled()
+    {
+        return errorCodePanel.gameObject.activeSelf;
+
+    }
+
+    public bool IsGameOverScreenEnabled()
+    {
+        return gameOverPanel.gameObject.activeSelf;
+
+    }
+    public bool AnyScreenEnabled()
+    {
+        return IsErrorScreenEnabled() || IsGameOverScreenEnabled();
+
     }
 
 }

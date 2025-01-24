@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEditor;
 using UnityEngine.SceneManagement;
 
 public class PanelNavigationManager : MonoBehaviour
@@ -9,7 +8,7 @@ public class PanelNavigationManager : MonoBehaviour
     [SerializeField] private GameObject mainScreen; // Main screen to return to when closing
 
     [Header("Scene Settings")]
-    [SerializeField] private SceneAsset gameScene; // Drag the scene asset here
+    [SerializeField] private string gameSceneName; // Name of the scene to load
 
     private int currentPanelIndex = 0; // Tracks the current panel being displayed
 
@@ -62,15 +61,14 @@ public class PanelNavigationManager : MonoBehaviour
     // Main Menu Buttons
     public void StartGame()
     {
-        if (gameScene != null)
+        if (!string.IsNullOrEmpty(gameSceneName))
         {
             // Load the scene by its name
-            string sceneName = gameScene.name;
-            SceneManager.LoadScene(sceneName);
+            SceneManager.LoadScene(gameSceneName);
         }
         else
         {
-            Debug.LogWarning("Game scene is not assigned in the PanelNavigationManager script!");
+            Debug.LogWarning("Game scene name is not assigned in the PanelNavigationManager script!");
         }
     }
 

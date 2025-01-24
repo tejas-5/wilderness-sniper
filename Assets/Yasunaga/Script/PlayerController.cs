@@ -21,13 +21,16 @@ public class PlayerController : MonoBehaviour
 
     public PopUpController popUpController;
     [SerializeField] float mpIncreaseInterval = 1f;
-    [SerializeField] float mpIncreaseAmount = 1;
-    [SerializeField] float popUpChance = 0.1f;
+    [SerializeField] float mpIncreaseAmount = 1f;
+    [SerializeField] float popUpChance = 0.01f;
 
     private bool isPopUpWaiting = false;
 
     public GameObject gameOverPanel;
     public GameObject errorCodePanel;
+
+    private float popUpCooldown = 20f; // Cooldown time in seconds
+    private float lastPopUpTime = 0f;
 
     void Start()
     {
@@ -118,16 +121,16 @@ public class PlayerController : MonoBehaviour
     {
         while (true)
         {
-            // Increase MP
             IncreaseMp();
 
             // Check if a pop-up should be triggered
-            if (currentPlayerMp < maxPlayerMp && Random.value <= popUpChance)
+            if (currentPlayerMp < maxPlayerMp && Random.value <= popUpChance && Time.time > lastPopUpTime + popUpCooldown)
             {
                 if (playerHp > 10 && popUpController != null)
                 {
                     popUpController.StartRandomPopUpCoroutine(true);
                     isPopUpWaiting = true;
+                    lastPopUpTime = Time.time; // Update the last pop-up time
 
                     // Wait for the pop-up to be resolved
                     yield return new WaitUntil(() => !isPopUpWaiting);

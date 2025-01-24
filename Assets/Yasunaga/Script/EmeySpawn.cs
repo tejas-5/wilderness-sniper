@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemySpawn : MonoBehaviour
+public class EmeySpawn : MonoBehaviour
 {
     [SerializeField] GameObject enemyPrefab; // 敵のプレハブ
     [SerializeField] float spawnInterval; // スポーン間隔

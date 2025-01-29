@@ -863,6 +863,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 6897251542657519335, guid: 24d6699409044664da643e938b584702, type: 3}
+      propertyPath: pausePanel
+      value: 
+      objectReference: {fileID: 960823088}
+    - target: {fileID: 6897251542657519335, guid: 24d6699409044664da643e938b584702, type: 3}
       propertyPath: gameOverPanel
       value: 
       objectReference: {fileID: 1201389003}
@@ -923,6 +927,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 24d6699409044664da643e938b584702, type: 3}
+--- !u!114 &223518586 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6897251542657519335, guid: 24d6699409044664da643e938b584702, type: 3}
+  m_PrefabInstance: {fileID: 223518585}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a6dc27f52e442b41a499b1442db3f00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &297195145
 GameObject:
   m_ObjectHideFlags: 0
@@ -1401,6 +1416,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1412054688488057874, guid: 10c687a52b047a847a85ea1495d9c0f9, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 223518586}
     - target: {fileID: 4258680534055962273, guid: 10c687a52b047a847a85ea1495d9c0f9, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -1485,6 +1504,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameOver
       objectReference: {fileID: 0}
+    - target: {fileID: 8494389153429114974, guid: 10c687a52b047a847a85ea1495d9c0f9, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 223518586}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1875,6 +1898,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &960823088 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7899288251957865585, guid: 10c687a52b047a847a85ea1495d9c0f9, type: 3}
+  m_PrefabInstance: {fileID: 451564974}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &998412774
 GameObject:
   m_ObjectHideFlags: 0

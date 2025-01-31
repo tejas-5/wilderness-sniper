@@ -27,6 +27,9 @@ public class BatController : MonoBehaviour
 
     [SerializeField] private GameObject panel;
 
+    [SerializeField] AudioClip destructionSound;
+    private AudioSource audioSource;
+
     void Start()
     {
         centerPosition = transform.position;
@@ -39,6 +42,7 @@ public class BatController : MonoBehaviour
 
         // Rendererコンポーネントを取得
         objectRenderer = GetComponent<Renderer>();
+        audioSource = GetComponent<AudioSource>();
     }
     //飛行移動
     IEnumerator MoveBat()
@@ -125,8 +129,15 @@ public class BatController : MonoBehaviour
         // スコアを加算
         scoreManager.AddScore(scoreValue);
 
-        // 敵を削除
-        Destroy(gameObject);
+        if (audioSource != null && destructionSound != null)
+        {
+            audioSource.PlayOneShot(destructionSound);
+            Destroy(gameObject, destructionSound.length);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void Damage()

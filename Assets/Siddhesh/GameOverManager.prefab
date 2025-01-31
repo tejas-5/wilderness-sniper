@@ -46,10 +46,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameOverPanel: {fileID: 0}
+  pausePanel: {fileID: 0}
+  gameClearPanel: {fileID: 0}
+  errorCodePanel: {fileID: 0}
   gameClearSound: {fileID: 8300000, guid: 046b794ea413c87449f308d2262d1366, type: 3}
   volumeScale: 0.5
+  gameOverSound: {fileID: 8300000, guid: 88b0c07831d45734295cf803348fd9ac, type: 3}
   popUpController: {fileID: 0}
-  errorCodePanel: {fileID: 0}
 --- !u!82 &3112252080353148168
 AudioSource:
   m_ObjectHideFlags: 0

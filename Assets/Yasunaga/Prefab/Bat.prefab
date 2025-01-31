@@ -164,8 +164,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scaleSpeed: 0.3
   maxSize: 2
+  flashSize: 1.7
   scoreValue: 50
   damage: 10
+  panel: {fileID: 0}
+  destructionSound: {fileID: 8300000, guid: 38e8d29ee61f5964387fde5f5a6569f2, type: 3}
 --- !u!95 &3047753122162326133
 Animator:
   serializedVersion: 5

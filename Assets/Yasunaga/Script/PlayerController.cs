@@ -32,6 +32,9 @@ public class PlayerController : MonoBehaviour
     private float popUpCooldown = 20f; // Cooldown time in seconds
     private float lastPopUpTime = 0f;
 
+    public AudioClip clickSound; // Drag and drop your sound in the inspector
+    private AudioSource audioSource;
+
     void Start()
     {
         playerHp = maxPlayerHp;
@@ -52,6 +55,8 @@ public class PlayerController : MonoBehaviour
         }
 
         StartCoroutine(IncreaseMpOverTime());
+
+        audioSource = GetComponent<AudioSource>();
     }
 
 
@@ -66,6 +71,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             ReduceMp();
+            PlayClickSound();
         }
 
         if (playerHp <= 0)
@@ -74,6 +80,13 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void PlayClickSound()
+    {
+        if (audioSource && clickSound)
+        {
+            audioSource.PlayOneShot(clickSound); // Play the sound once
+        }
+    }
 
     public void AddDamage(int damage)
     {

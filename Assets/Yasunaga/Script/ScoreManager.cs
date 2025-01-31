@@ -5,25 +5,27 @@ using UnityEngine.UI;
 
 public class ScoreManager : MonoBehaviour
 {
-    public int score = 0;              // スコア変数
-    public Text scoreText;             // UI Textコンポーネント参照用
+    public int score = 0;              // Score variable
+    public Text scoreText;             // First UI Text (for displaying the score)
+    public Text scoreText2;            // Second UI Text (for displaying the same score)
 
     void Start()
     {
-        // 初期スコアを表示
+        // Initialize the score display
         UpdateScoreText();
     }
 
-    // スコアを加算するメソッド
+    // Method to add points to the score
     public void AddScore(int points)
     {
         score += points;
-        UpdateScoreText();             // スコア表示を更新
+        UpdateScoreText();             // Update both Text elements
     }
 
-    // スコアテキストを更新するメソッド
+    // Method to update both UI Text elements with the current score
     void UpdateScoreText()
     {
         scoreText.text = "Score: " + score;
+        scoreText2.text = "Score: " + score;  // Update second score display
     }
 }

@@ -17,6 +17,9 @@ public class SlimeController : MonoBehaviour
     private Renderer objectRenderer; // オブジェクトのRenderer
     private bool isFlashing = false; // 点滅中かどうか
 
+    [SerializeField] AudioClip destructionSound;
+    private AudioSource audioSource;
+
     void Start()
     {
         initialScale = transform.localScale; // 初期スケールを取得
@@ -27,6 +30,7 @@ public class SlimeController : MonoBehaviour
 
         // Rendererコンポーネントを取得
         objectRenderer = GetComponent<Renderer>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -68,8 +72,15 @@ public class SlimeController : MonoBehaviour
         // スコアを加算
         scoreManager.AddScore(scoreValue);
 
-        // 敵を削除
-        Destroy(gameObject);
+        if (audioSource != null && destructionSound != null)
+        {
+            audioSource.PlayOneShot(destructionSound);
+            Destroy(gameObject, destructionSound.length);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void Damage()

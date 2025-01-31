@@ -37,6 +37,9 @@ public class BossController : MonoBehaviour
     // GameManagerへの参照
     private GameManager gameManager;
 
+    [SerializeField] AudioClip destructionSound;
+    private AudioSource audioSource;
+
     void Start()
     {
         transform.position = startPosition;
@@ -53,6 +56,8 @@ public class BossController : MonoBehaviour
         StartCoroutine(SpawnBoss());
 
         StartCoroutine(ArmAttack());
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -164,13 +169,21 @@ public class BossController : MonoBehaviour
         if (gameManager != null)
         {
             //Debug.Log("GameManagerのGameOverメソッドを呼び出します。");
-            gameManager.GameOver();
+            gameManager.GameClear();
         }
         else
         {
             Debug.LogWarning("GameManagerが設定されていません。");
         }
 
-        Destroy(gameObject);
+        if (audioSource != null && destructionSound != null)
+        {
+            audioSource.PlayOneShot(destructionSound);
+            Destroy(gameObject, destructionSound.length);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 }

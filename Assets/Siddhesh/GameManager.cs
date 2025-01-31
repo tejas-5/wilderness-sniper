@@ -5,12 +5,18 @@ public class GameManager : MonoBehaviour
 {
     public GameObject gameOverPanel;
     public GameObject pausePanel; // Reference to the Pause Panel
+    public GameObject gameClearPanel;
+    public GameObject errorCodePanel;  // Reference to the ErrorCode Panel
+
     [SerializeField] private AudioClip gameClearSound;
     [SerializeField] private float volumeScale = 0.5f; // Default volume scale set to 50%
     private AudioSource audioSource;
+    [SerializeField] private AudioClip gameOverSound;
+
     private bool isGameOver = false; // Flag to prevent multiple calls to GameOver
+    private bool isGameClear = false;
+
     public PopUpController popUpController;  // Reference to the PopUpController
-    public GameObject errorCodePanel;  // Reference to the ErrorCode Panel
 
     public static GameManager Instance { get; private set; }
     private bool isPaused = false; // Flag to check if the game is paused
@@ -33,11 +39,8 @@ public class GameManager : MonoBehaviour
         // Hide GameOverPanel initially
         gameOverPanel.SetActive(false);
         pausePanel.SetActive(false); // Hide the pause panel initially
+        gameClearPanel.SetActive(false);
         audioSource = GetComponent<AudioSource>();
-        if (gameOverPanel == null)
-        {
-            Debug.LogWarning("GameOverPanel");
-        }
     }
 
     public void GameOver()
@@ -54,6 +57,26 @@ public class GameManager : MonoBehaviour
         else
         {
             Debug.LogWarning("PopUpController is not assigned in GameManager!");
+        }
+        Time.timeScale = 0f;
+        if (gameOverSound != null)
+        {
+            audioSource.PlayOneShot(gameOverSound, volumeScale);
+        }
+        else
+        {
+            Debug.LogWarning("GameOverSound is not assigned in the GameManager script!");
+        }
+    }
+
+    public void GameClear()
+    {
+        if (isGameClear) return;
+        isGameClear = true;
+        gameClearPanel.SetActive(true);
+        if (popUpController != null)
+        { 
+            popUpController.ClosePopUp(); 
         }
         Time.timeScale = 0f;
         // Play the gameClearSound with adjustable volume
@@ -106,9 +129,14 @@ public class GameManager : MonoBehaviour
         return pausePanel.gameObject.activeSelf;
     }
 
+    public bool IsGameClearScreenEnabled()
+    {
+        return gameClearPanel.gameObject.activeSelf;
+    }
+
     public bool AnyScreenEnabled()
     {
-        return IsErrorScreenEnabled() || IsGameOverScreenEnabled() || IsPauseScreenEnabled();
+        return IsErrorScreenEnabled() || IsGameOverScreenEnabled() || IsPauseScreenEnabled() || IsGameClearScreenEnabled();
     }
 
     // Method to handle pausing and unpausing the game
@@ -128,9 +156,14 @@ public class GameManager : MonoBehaviour
     {
         if (!isGameOver)
         {
+            if (popUpController != null)
+            {
+                popUpController.ClosePopUp();
+            }
             pausePanel.SetActive(true);
             Time.timeScale = 0f;
             isPaused = true;
+
         }
     }
 

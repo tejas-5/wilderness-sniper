@@ -82,7 +82,11 @@ public class PlayerController : MonoBehaviour
 
     void PlayClickSound()
     {
-        if (audioSource && clickSound)
+        if (GameManager.Instance.AnyScreenEnabled())
+        {
+            return;
+        }
+        else if (audioSource && clickSound)
         {
             audioSource.PlayOneShot(clickSound); // Play the sound once
         }

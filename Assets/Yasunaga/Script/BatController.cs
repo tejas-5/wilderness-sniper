@@ -132,7 +132,7 @@ public class BatController : MonoBehaviour
         if (audioSource != null && destructionSound != null)
         {
             audioSource.PlayOneShot(destructionSound);
-            Destroy(gameObject, destructionSound.length);
+            Destroy(gameObject);
         }
         else
         {

@@ -71,16 +71,8 @@ public class SlimeController : MonoBehaviour
     {
         // ƒXƒRƒA‚ð‰ÁŽZ
         scoreManager.AddScore(scoreValue);
+        Destroy(gameObject);
 
-        if (audioSource != null && destructionSound != null)
-        {
-            audioSource.PlayOneShot(destructionSound);
-            Destroy(gameObject, destructionSound.length);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
     }
 
     private void Damage()

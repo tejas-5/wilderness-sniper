@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class FastMissile : MonoBehaviour
 {
-    [SerializeField] float scaleSpeed = 0.7f; // スケールの速度
+    [SerializeField] float scaleSpeed = 0.5f; // スケールの速度
     private Vector3 initialScale;    // 初期スケール
-    [SerializeField] float maxSize = 2.0f;     // 最大サイズ
+    [SerializeField] float maxSize = 2.5f;     // 最大サイズ
 
     [SerializeField] int scoreValue = 50; // この敵を倒した時のスコア
     private ScoreManager scoreManager;
@@ -28,7 +28,7 @@ public class FastMissile : MonoBehaviour
         // スケールを徐々に大きくする
         transform.localScale += initialScale * scaleSpeed * Time.deltaTime;
 
-        transform.Translate(0, -0.001f, 0);
+        transform.Translate(0, -0.003f, 0);
 
         // 現在のサイズが最大サイズを超えたらオブジェクトを消去
         if (transform.localScale.x >= maxSize ||

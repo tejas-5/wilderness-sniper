@@ -10,9 +10,9 @@ public class MissileController : MonoBehaviour
 
     private bool movingUp = true; // 上昇中か下降中かを判定
 
-    [SerializeField] float scaleSpeed = 0.3f; // スケールの速度
+    [SerializeField] float scaleSpeed = 0.2f; // スケールの速度
     private Vector3 initialScale;    // 初期スケール
-    [SerializeField] float maxSize = 2.0f;     // 最大サイズ
+    [SerializeField] float maxSize = 2.3f;     // 最大サイズ
 
     [SerializeField] int scoreValue = 50; // この敵を倒した時のスコア
     private ScoreManager scoreManager;

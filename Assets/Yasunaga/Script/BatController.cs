@@ -14,6 +14,7 @@ public class BatController : MonoBehaviour
     [SerializeField] float scaleSpeed = 0.3f; // スケールの速度
     private Vector3 firstScale;    // 初期スケール
     [SerializeField] float maxSize = 2.0f;     // 最大サイズ
+    [SerializeField] float flashSize = 1.7f;     // 最大サイズ
 
     //パラメーター
     private ScoreManager scoreManager;
@@ -21,15 +22,23 @@ public class BatController : MonoBehaviour
     [SerializeField] int damage = 10; //受けるダメージ
     private PlayerController playerController;
 
+    private Renderer objectRenderer; // オブジェクトのRenderer
+    private bool isFlashing = false; // 点滅中かどうか
+
+    [SerializeField] private GameObject panel;
+
     void Start()
     {
         centerPosition = transform.position;
-        firstScale = transform.localScale; 
+        firstScale = transform.localScale;
 
         StartCoroutine(MoveBat());
 
         scoreManager = GameObject.Find("ScoreManager").GetComponent<ScoreManager>();
         playerController = GameObject.Find("Player").GetComponent<PlayerController>();
+
+        // Rendererコンポーネントを取得
+        objectRenderer = GetComponent<Renderer>();
     }
     //飛行移動
     IEnumerator MoveBat()
@@ -70,6 +79,16 @@ public class BatController : MonoBehaviour
         // スケールを徐々に大きくする
         transform.localScale += firstScale * scaleSpeed * Time.deltaTime;
 
+
+        if (transform.localScale.x >= flashSize ||
+        transform.localScale.y >= flashSize ||
+        transform.localScale.z >= flashSize)
+        {
+            if (!isFlashing)
+            {
+                StartCoroutine(Flash());
+            }
+        }
         // 現在のサイズが最大サイズを超えたらオブジェクトを消去
         if (transform.localScale.x >= maxSize ||
             transform.localScale.y >= maxSize ||
@@ -79,8 +98,25 @@ public class BatController : MonoBehaviour
         }
     }
 
+    private IEnumerator Flash()
+    {
+        isFlashing = true;
+        Color originalColor = objectRenderer.material.color; // 元の色を保存
+        Color flashColor = new Color(1f, 0f, 0f, 1f);
+        while (true)
+        {
+            objectRenderer.material.color = flashColor;
+            yield return new WaitForSeconds(0.1f);
+            objectRenderer.material.color = originalColor;
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
     void OnMouseDown()
     {
+        if (GameManager.Instance.AnyScreenEnabled())
+        {
+            return;
+        }
         Die();
     }
 

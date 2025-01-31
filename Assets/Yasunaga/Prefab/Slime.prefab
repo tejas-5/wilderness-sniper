@@ -164,6 +164,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scaleSpeed: 0.3
   maxSize: 2
+  flashSize: 1.7
   scoreValue: 10
   damage: 10
 --- !u!95 &504514390383559002

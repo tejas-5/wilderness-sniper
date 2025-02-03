@@ -18,6 +18,7 @@ public class MissileController : MonoBehaviour
     private ScoreManager scoreManager;
     [SerializeField] int damage = 10; //受けるダメージ
     private PlayerController playerController;
+    private Animator animator;
 
     void Start()
     {
@@ -27,6 +28,7 @@ public class MissileController : MonoBehaviour
         scoreManager = GameObject.Find("ScoreManager").GetComponent<ScoreManager>();
 
         playerController = GameObject.Find("Player").GetComponent<PlayerController>();
+        animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -88,7 +90,12 @@ public class MissileController : MonoBehaviour
         // スコアを加算
         scoreManager.AddScore(scoreValue);
 
-        // 敵を削除
+        animator.SetTrigger("Effect");
+        StartCoroutine(Destroy());
+    }
+    private IEnumerator Destroy()
+    {
+        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
         Destroy(gameObject);
     }
 

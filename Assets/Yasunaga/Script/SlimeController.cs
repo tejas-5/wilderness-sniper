@@ -19,6 +19,7 @@ public class SlimeController : MonoBehaviour
 
     [SerializeField] AudioClip destructionSound;
     private AudioSource audioSource;
+    private Animator animator;
 
     void Start()
     {
@@ -31,6 +32,7 @@ public class SlimeController : MonoBehaviour
         // Rendererコンポーネントを取得
         objectRenderer = GetComponent<Renderer>();
         audioSource = GetComponent<AudioSource>();
+        animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -71,8 +73,13 @@ public class SlimeController : MonoBehaviour
     {
         // スコアを加算
         scoreManager.AddScore(scoreValue);
+        animator.SetTrigger("Effect");
+        StartCoroutine(Destroy());
+    }
+    private IEnumerator Destroy()
+    {
+        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
         Destroy(gameObject);
-
     }
 
     private void Damage()

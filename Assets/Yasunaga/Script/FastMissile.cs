@@ -12,6 +12,7 @@ public class FastMissile : MonoBehaviour
     private ScoreManager scoreManager;
     [SerializeField] int damage = 10;
     private PlayerController playerController;
+    private Animator animator;
 
     void Start()
     {
@@ -21,6 +22,7 @@ public class FastMissile : MonoBehaviour
         scoreManager = GameObject.Find("ScoreManager").GetComponent<ScoreManager>();
 
         playerController = GameObject.Find("Player").GetComponent<PlayerController>();
+        animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -54,7 +56,12 @@ public class FastMissile : MonoBehaviour
         // ÉXÉRÉAÇâ¡éZ
         scoreManager.AddScore(scoreValue);
 
-        // ìGÇçÌèú
+        animator.SetTrigger("Effect");
+        StartCoroutine(Destroy());
+    }
+    private IEnumerator Destroy()
+    {
+        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
         Destroy(gameObject);
     }
 

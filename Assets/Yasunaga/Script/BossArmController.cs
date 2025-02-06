@@ -11,10 +11,13 @@ public class BossArmController : MonoBehaviour
     private AudioSource audioSource; 
     private bool isDestroyed = false; 
 
+    private Animator animator;
+
     void Start()
     {
         scoreManager = GameObject.Find("ScoreManager")?.GetComponent<ScoreManager>();
         audioSource = GetComponent<AudioSource>();
+        animator = GetComponent<Animator>();
 
         if (scoreManager == null)
         {

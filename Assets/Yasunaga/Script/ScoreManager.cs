@@ -26,6 +26,6 @@ public class ScoreManager : MonoBehaviour
     void UpdateScoreText()
     {
         scoreText.text = score.ToString();
-        scoreText2.text = score.ToString();  // Update second score display
+        scoreText2.text = "Score: " + score.ToString();  // Update second score display
     }
 }

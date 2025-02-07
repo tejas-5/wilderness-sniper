@@ -10,14 +10,15 @@ public class MissileController : MonoBehaviour
 
     private bool movingUp = true; // 上昇中か下降中かを判定
 
-    [SerializeField] float scaleSpeed = 0.3f; // スケールの速度
+    [SerializeField] float scaleSpeed = 0.2f; // スケールの速度
     private Vector3 initialScale;    // 初期スケール
-    [SerializeField] float maxSize = 2.0f;     // 最大サイズ
+    [SerializeField] float maxSize = 2.3f;     // 最大サイズ
 
     [SerializeField] int scoreValue = 50; // この敵を倒した時のスコア
     private ScoreManager scoreManager;
     [SerializeField] int damage = 10; //受けるダメージ
     private PlayerController playerController;
+    private Animator animator;
 
     void Start()
     {
@@ -27,6 +28,7 @@ public class MissileController : MonoBehaviour
         scoreManager = GameObject.Find("ScoreManager").GetComponent<ScoreManager>();
 
         playerController = GameObject.Find("Player").GetComponent<PlayerController>();
+        animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -76,6 +78,10 @@ public class MissileController : MonoBehaviour
 
     void OnMouseDown()
     {
+        if (GameManager.Instance.AnyScreenEnabled())
+        {
+            return;
+        }
         Die();
     }
 
@@ -84,7 +90,12 @@ public class MissileController : MonoBehaviour
         // スコアを加算
         scoreManager.AddScore(scoreValue);
 
-        // 敵を削除
+        animator.SetTrigger("Effect");
+        StartCoroutine(Destroy());
+    }
+    private IEnumerator Destroy()
+    {
+        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
         Destroy(gameObject);
     }
 

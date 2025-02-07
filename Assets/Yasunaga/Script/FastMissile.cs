@@ -4,14 +4,15 @@ using UnityEngine;
 
 public class FastMissile : MonoBehaviour
 {
-    [SerializeField] float scaleSpeed = 0.7f; // スケールの速度
+    [SerializeField] float scaleSpeed = 0.5f; // スケールの速度
     private Vector3 initialScale;    // 初期スケール
-    [SerializeField] float maxSize = 2.0f;     // 最大サイズ
+    [SerializeField] float maxSize = 2.5f;     // 最大サイズ
 
     [SerializeField] int scoreValue = 50; // この敵を倒した時のスコア
     private ScoreManager scoreManager;
     [SerializeField] int damage = 10;
     private PlayerController playerController;
+    private Animator animator;
 
     void Start()
     {
@@ -21,6 +22,7 @@ public class FastMissile : MonoBehaviour
         scoreManager = GameObject.Find("ScoreManager").GetComponent<ScoreManager>();
 
         playerController = GameObject.Find("Player").GetComponent<PlayerController>();
+        animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -28,7 +30,7 @@ public class FastMissile : MonoBehaviour
         // スケールを徐々に大きくする
         transform.localScale += initialScale * scaleSpeed * Time.deltaTime;
 
-        transform.Translate(0, -0.001f, 0);
+        transform.Translate(0, -0.003f, 0);
 
         // 現在のサイズが最大サイズを超えたらオブジェクトを消去
         if (transform.localScale.x >= maxSize ||
@@ -42,6 +44,10 @@ public class FastMissile : MonoBehaviour
 
     void OnMouseDown()
     {
+        if (GameManager.Instance.AnyScreenEnabled())
+        {
+            return;
+        }
         Die();
     }
 
@@ -50,7 +56,12 @@ public class FastMissile : MonoBehaviour
         // スコアを加算
         scoreManager.AddScore(scoreValue);
 
-        // 敵を削除
+        animator.SetTrigger("Effect");
+        StartCoroutine(Destroy());
+    }
+    private IEnumerator Destroy()
+    {
+        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
         Destroy(gameObject);
     }
 

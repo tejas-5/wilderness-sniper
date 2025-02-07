@@ -5,22 +5,29 @@ using UnityEngine;
 public class BossArmController : MonoBehaviour
 {
     [SerializeField] int armHp = 10;
-    [SerializeField] int hitDamage = 1;
-    [SerializeField] int scoreValue = 100; // Score value when destroyed
-    [SerializeField] AudioClip destructionSound; // Sound to play when destroyed
+    [SerializeField] int scoreValue = 100;
+    [SerializeField] AudioClip destructionSound;
     private ScoreManager scoreManager;
-    private AudioSource audioSource; // Reference to AudioSource
-    private bool isDestroyed = false; // Flag to ensure the sound is played once
+    private AudioSource audioSource; 
+    private bool isDestroyed = false; 
+
+    private Animator animator;
 
     void Start()
     {
-        scoreManager = GameObject.Find("ScoreManager").GetComponent<ScoreManager>();
-        audioSource = GetComponent<AudioSource>(); // Get the AudioSource component on this GameObject
+        scoreManager = GameObject.Find("ScoreManager")?.GetComponent<ScoreManager>();
+        audioSource = GetComponent<AudioSource>();
+        animator = GetComponent<Animator>();
+
+        if (scoreManager == null)
+        {
+            Debug.LogWarning("ScoreManagerが見つかりませんでした。");
+        }
     }
 
     void Update()
     {
-        if (armHp == 0 && !isDestroyed) // Check if the arm is not destroyed yet
+        if (armHp == 0 && !isDestroyed) 
         {
             Die();
         }
@@ -28,27 +35,35 @@ public class BossArmController : MonoBehaviour
 
     void OnMouseDown()
     {
-        if (!isDestroyed) // Only allow damage if the arm is not destroyed
+        if (GameManager.Instance.AnyScreenEnabled())
         {
-            armHp -= hitDamage;
+            return;
         }
+        // armHp を減らす
+        armHp = Mathf.Max(armHp - 1, 0);
     }
 
     private void Die()
     {
-        // Set the flag to prevent further destruction
         isDestroyed = true;
 
-        // Add score
-        scoreManager.AddScore(scoreValue);
+        if (scoreManager != null)
+        {
+            scoreManager.AddScore(scoreValue);
+        }
+        else
+        {
+            Debug.LogWarning("スコアを加算できません。ScoreManagerが設定されていません。");
+        }
 
-        // Play the destruction sound
         if (audioSource != null && destructionSound != null)
         {
             audioSource.PlayOneShot(destructionSound);
+            Destroy(gameObject, destructionSound.length);
         }
-
-        // Destroy the GameObject after the sound finishes playing
-        Destroy(gameObject, destructionSound.length); // Destroy after the sound finishes playing
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 }

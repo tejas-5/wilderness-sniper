@@ -4,47 +4,41 @@ using UnityEngine;
 
 public class BossController : MonoBehaviour
 {
-    //ボス移動
+    // ボス移動
     private Vector2 pos;
-
-    
-
-    [SerializeField] int num = 1;//方向
-
+    private int num = 1; // 移動方向
     [SerializeField] int moveSpeed = 3;
 
-    //ボススポーン
-    [SerializeField] float spawnDelay = 60f;// スポーンまでの時間
+    // ボススポーン
+    [SerializeField] float spawnDelay = 60f; // スポーンまでの時間
     [SerializeField] Vector3 startPosition; // 初期位置
-    [SerializeField] Vector3 endPosition;    // 最終位置
-    [SerializeField] float moveDuration = 0.3f; //最終位置移動までかかる時間
+    [SerializeField] Vector3 endPosition; // 最終位置
+    [SerializeField] float moveDuration = 0.3f; // 最終位置移動までかかる時間
 
-    //ハサミからの攻撃
-
-    private bool isSpawning = true; // 生成を制御するフラグ
-
+    // ハサミからの攻撃
     private bool isArmAttack = true; // 生成を制御するフラグ
-
-    [SerializeField] float missileDelay = 62f;　//ミサイル発射までの時間
+    [SerializeField] float missileDelay = 62f; // ミサイル発射までの時間
     [SerializeField] GameObject missilePrefab;
     [SerializeField] float armInterval = 3f; // オブジェクトを生成する間隔（秒）
     [SerializeField] Transform rightArm;
     [SerializeField] Transform leftArm;
-    //尻尾からの攻撃
+    // 尻尾からの攻撃
     private bool isTealAttack = false;
     [SerializeField] GameObject fastMissilePrefab;
     [SerializeField] float tealInterval = 2f;
     [SerializeField] Transform teal;
 
-    //パラメーター
-
+    // パラメーター
     [SerializeField] int bossHp = 20;
-
-    
-
     [SerializeField] int hitDamage = 1;
-    [SerializeField] int scoreValue = 150; // この敵を倒した時のスコア
+    [SerializeField] int scoreValue = 300; // この敵を倒した時のスコア
     private ScoreManager scoreManager;
+
+    // GameManagerへの参照
+    private GameManager gameManager;
+
+    [SerializeField] AudioClip destructionSound;
+    private AudioSource audioSource;
 
     void Start()
     {
@@ -52,9 +46,18 @@ public class BossController : MonoBehaviour
 
         scoreManager = GameObject.Find("ScoreManager").GetComponent<ScoreManager>();
 
+        // GameManagerの参照を取得
+        gameManager = FindObjectOfType<GameManager>();
+        if (gameManager == null)
+        {
+            Debug.LogWarning("GameManagerが見つかりませんでした。");
+        }
+
         StartCoroutine(SpawnBoss());
 
         StartCoroutine(ArmAttack());
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -66,10 +69,13 @@ public class BossController : MonoBehaviour
         if (pos.x > 5.5) num = -1;
         if (pos.x < -5.5) num = 1;
 
-        //if (bossHp == 0) Die();
+        if (bossHp == 0)
+        {
+            Die();
+        }
     }
 
-    //ボススポーン
+    // ボススポーン
     private IEnumerator SpawnBoss()
     {
         yield return new WaitForSeconds(spawnDelay);
@@ -82,16 +88,12 @@ public class BossController : MonoBehaviour
             elapsedTime += Time.deltaTime;
 
             yield return null;
-
-            yield return null; 
-
         }
-
-        //最終位置を設定
+        // 最終位置を設定
         transform.position = endPosition;
     }
 
-    //ハサミ攻撃
+    // ハサミ攻撃
     private IEnumerator ArmAttack()
     {
         yield return new WaitForSeconds(missileDelay);
@@ -102,7 +104,8 @@ public class BossController : MonoBehaviour
             yield return new WaitForSeconds(armInterval);
         }
     }
-    //ハサミミサイル
+
+    // ハサミミサイル
     void ArmMissile()
     {
         if (rightArm != null || leftArm != null)
@@ -110,20 +113,20 @@ public class BossController : MonoBehaviour
             Transform selectedPosition = null;
 
             // 発射位置をランダムで選択
-            if (rightArm != null && leftArm != null) 
+            if (rightArm != null && leftArm != null)
                 selectedPosition = Random.Range(0, 2) == 0 ? rightArm : leftArm;
             // 右ハサミのみ存在する場合
-            else if (rightArm != null) 
+            else if (rightArm != null)
                 selectedPosition = rightArm;
             // 左ハサミのみ存在する場合
-            else if (leftArm != null) 
+            else if (leftArm != null)
                 selectedPosition = leftArm;
 
             // 発射位置が決定している場合のみミサイルを生成
-            if (selectedPosition != null) 
+            if (selectedPosition != null)
                 Instantiate(missilePrefab, selectedPosition.position, selectedPosition.rotation);
         }
-        //両ハサミが破壊されたら尻尾攻撃
+        // 両ハサミが破壊されたら尻尾攻撃
         else if (!isTealAttack)
         {
             isTealAttack = true; // 尻尾攻撃開始フラグを設定
@@ -131,37 +134,55 @@ public class BossController : MonoBehaviour
         }
     }
 
-    //尻尾攻撃
+    // 尻尾攻撃
     private IEnumerator TealAttack()
     {
-
         while (isTealAttack)
         {
             TealMissile();
             yield return new WaitForSeconds(tealInterval);
-
-            while (isTealAttack)
-            {
-                TealMissile();
-                yield return new WaitForSeconds(tealInterval);
-
-            }
         }
-        //尻尾ミサイル
-        void TealMissile()
-        {
-            if (teal != null)
-                Instantiate(fastMissilePrefab, teal.position, teal.rotation);
-        }
-        void OnMouseDown()
-        {
-            bossHp -= hitDamage;
-        }
-        void Die()
-        {
-            // スコアを加算
-            scoreManager.AddScore(scoreValue);
+    }
 
+    // 尻尾ミサイル
+    void TealMissile()
+    {
+        if (teal != null)
+            Instantiate(fastMissilePrefab, teal.position, teal.rotation);
+    }
+
+    void OnMouseDown()
+    {
+        if (GameManager.Instance.AnyScreenEnabled())
+        {
+            return;
+        }
+        bossHp -= hitDamage;
+    }
+
+    void Die()
+    {
+        // スコアを加算
+        scoreManager.AddScore(scoreValue);
+
+        // GameOverを呼び出す
+        if (gameManager != null)
+        {
+            //Debug.Log("GameManagerのGameOverメソッドを呼び出します。");
+            gameManager.GameClear();
+        }
+        else
+        {
+            Debug.LogWarning("GameManagerが設定されていません。");
+        }
+
+        if (audioSource != null && destructionSound != null)
+        {
+            audioSource.PlayOneShot(destructionSound);
+            Destroy(gameObject);
+        }
+        else
+        {
             Destroy(gameObject);
         }
     }

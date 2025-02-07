@@ -1,29 +1,31 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using TMPro;  // TextMeshProを使用するための追加
 
 public class ScoreManager : MonoBehaviour
 {
-    public int score = 0;              // スコア変数
-    public Text scoreText;             // UI Textコンポーネント参照用
+    public int score = 0;               // Score variable
+    public TMP_Text scoreText;          // First UI Text (for displaying the score)
+    public TMP_Text scoreText2;         // Second UI Text (for displaying the same score)
 
     void Start()
     {
-        // 初期スコアを表示
+        // Initialize the score display
         UpdateScoreText();
     }
 
-    // スコアを加算するメソッド
+    // Method to add points to the score
     public void AddScore(int points)
     {
         score += points;
-        UpdateScoreText();             // スコア表示を更新
+        UpdateScoreText();              // Update both Text elements
     }
 
-    // スコアテキストを更新するメソッド
+    // Method to update both UI Text elements with the current score
     void UpdateScoreText()
     {
-        scoreText.text = "Score: " + score;
+        scoreText.text = score.ToString();
+        scoreText2.text = score.ToString();  // Update second score display
     }
 }
